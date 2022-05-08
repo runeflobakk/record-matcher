@@ -3,12 +3,13 @@ package no.rune.record.matcher;
 import org.junit.jupiter.api.Test;
 
 import static no.rune.record.matcher.EmptyRecordMatcher.anyEmptyRecord;
+import static no.rune.record.matcher.ExpectedMatcher.expectedMatcherFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.co.probablyfine.matchers.Java8Matchers.where;
 
-public class EmptyRecordMatcherTest {
+class EmptyRecordMatcherTest {
 
     @Test
     void doesNotMatchNull() {
@@ -20,6 +21,11 @@ public class EmptyRecordMatcherTest {
     @Test
     void matchesTheRecord() {
         assertThat(new EmptyRecord(), anyEmptyRecord());
+    }
+
+    @Test
+    void generatesExpectedMatcher() {
+        expectedMatcherFor(EmptyRecord.class).assertEqualToGeneratedMatcherSourceCode();
     }
 
 }
