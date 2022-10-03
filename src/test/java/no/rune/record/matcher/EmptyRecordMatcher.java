@@ -13,11 +13,12 @@ public final class EmptyRecordMatcher extends TypeSafeDiagnosingMatcher<EmptyRec
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("any " + EmptyRecord.class.getSimpleName() + " record");
+        description.appendText("any ").appendText(EmptyRecord.class.getSimpleName()).appendText(" record");
     }
 
     @Override
     protected boolean matchesSafely(EmptyRecord element, Description mismatchDescription) {
-        return true;
+        boolean matches = true;
+        return matches;
     }
 }
