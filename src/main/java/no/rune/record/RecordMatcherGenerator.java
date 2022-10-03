@@ -17,14 +17,11 @@ import static javax.lang.model.element.Modifier.STATIC;
 
 public class RecordMatcherGenerator {
 
-    public String generateFromRecord(Class<?> record) {
+    public String generateFromRecord(Class<? extends Record> record) {
         return generateFromRecord(record, record.getPackage(), record.getSimpleName() + "Matcher");
     }
 
-    public String generateFromRecord(Class<?> record, Package target, String matcherClassName) {
-        if (!record.isRecord()) {
-            throw new IllegalArgumentException(record + " is not a record");
-        }
+    public String generateFromRecord(Class<? extends Record> record, Package target, String matcherSimpleClassName) {
 
         var fullyQualifiedMatcherClassName = ClassName.get(target.getName(), matcherClassName);
 
