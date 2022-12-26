@@ -1,4 +1,4 @@
-package no.rune.record.matcher;
+package no.rune.record.matcher.example.empty;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;

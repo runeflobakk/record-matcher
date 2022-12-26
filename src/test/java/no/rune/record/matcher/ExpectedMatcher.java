@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.co.probablyfine.matchers.Java8Matchers.where;
 
-record ExpectedMatcher(String fullyQualifiedClassName, String sourceCode, Class<? extends Record> record) {
+public record ExpectedMatcher(String fullyQualifiedClassName, String sourceCode, Class<? extends Record> record) {
 
     public static ExpectedMatcher expectedMatcherFor(Class<? extends Record> record) {
         String fullyQualifiedMatcherClassName = record.getName() + "Matcher";

@@ -1,4 +1,4 @@
-package no.rune.record.matcher;
+package no.rune.record.matcher.example.singlestring;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

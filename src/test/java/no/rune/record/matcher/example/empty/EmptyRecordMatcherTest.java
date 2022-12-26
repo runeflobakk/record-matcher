@@ -1,9 +1,9 @@
-package no.rune.record.matcher;
+package no.rune.record.matcher.example.empty;
 
 import org.junit.jupiter.api.Test;
 
-import static no.rune.record.matcher.EmptyRecordMatcher.anyEmptyRecord;
 import static no.rune.record.matcher.ExpectedMatcher.expectedMatcherFor;
+import static no.rune.record.matcher.example.empty.EmptyRecordMatcher.anyEmptyRecord;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;

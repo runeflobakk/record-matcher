@@ -1,10 +1,10 @@
-package no.rune.record.matcher;
+package no.rune.record.matcher.example.singlestring;
 
 import org.junit.jupiter.api.Test;
 
 import static no.rune.record.matcher.ExpectedMatcher.expectedMatcherFor;
-import static no.rune.record.matcher.SingleStringRecordMatcher.anySingleStringRecord;
-import static no.rune.record.matcher.SingleStringRecordMatcher.singleStringRecordWithValue;
+import static no.rune.record.matcher.example.singlestring.SingleStringRecordMatcher.anySingleStringRecord;
+import static no.rune.record.matcher.example.singlestring.SingleStringRecordMatcher.singleStringRecordWithValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
