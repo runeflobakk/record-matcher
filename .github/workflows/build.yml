@@ -46,10 +46,10 @@ jobs:
         server-username: OSS_SONATYPE_USERNAME
         server-password: OSS_SONATYPE_PASSWORD
     - name: Set version ${{ needs.publishing_parameters.outputs.version }}
-      run: mvn versions:set -DnewVersion=${{ needs.publishing_parameters.outputs.version }}
+      run: mvn ${MAVEN_ARGS} versions:set -DnewVersion=${{ needs.publishing_parameters.outputs.version }}
     - name: Build with Maven
       env:
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
         OSS_SONATYPE_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
-      run: mvn deploy
+      run: mvn ${MAVEN_ARGS} deploy
