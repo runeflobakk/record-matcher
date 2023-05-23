@@ -8,6 +8,10 @@
     <artifactId>record-matcher</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <name>Record Matcher</name>
+    <description>Generates Hamcrest matchers for Java records</description>
+    <url>https://github.com/runeflobakk/record-matcher</url>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -137,6 +141,17 @@
         </pluginManagement>
     </build>
 
+    <developers>
+        <developer>
+            <id>rflob</id>
+            <name>Rune Flobakk</name>
+            <roles>
+                <role>developer</role>
+                <role>maintainer</role>
+            </roles>
+        </developer>
+    </developers>
+
     <distributionManagement>
         <repository>
             <id>sonatype-nexus-staging</id>
@@ -149,5 +164,11 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:runeflobakk/record-matcher.git</connection>
+        <developerConnection>scm:git:git@github.com:runeflobakk/record-matcher.git</developerConnection>
+        <url>https://github.com/runeflobakk/record-matcher</url>
+    </scm>
 
 </project>
