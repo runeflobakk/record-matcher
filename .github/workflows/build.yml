@@ -5,8 +5,37 @@ name: Build with Maven
 on: [push]
 
 jobs:
-  build:
+
+  publishing_parameters:
+    name: Publishing parameters
     runs-on: ubuntu-latest
+    outputs:
+      distribution_server_id: ${{ steps.version.outputs.distribution_server_id }}
+      is_release: ${{ steps.version.outputs.is_release }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Determine version
+        id: version
+        run: |
+          if [[ $GITHUB_REF == *"tags"* ]]; then
+            distribution_server_id='sonatype-nexus-staging'
+            is_release=true
+            version=${GITHUB_REF#refs/tags/}
+          else
+            distribution_server_id='sonatype-nexus-snapshots'
+            is_release=false
+            version=${GITHUB_REF#refs/heads/}-SNAPSHOT
+          fi
+          echo "is_release=${is_release//\//-}" >> $GITHUB_OUTPUT
+          echo "version=${version//\//-}" >> $GITHUB_OUTPUT
+          echo "distribution_server_id=${distribution_server_id//\//-}" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build ${{ needs.publishing_parameters.outputs.version }} and publish to ${{ needs.publishing_parameters.outputs.distribution_server_id }}
+    needs: publishing_parameters
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_ARGS: --show-version --no-transfer-progress
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
@@ -15,5 +44,16 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+        gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+        server-id: ${{ needs.publishing_parameters.outputs.distribution_server_id }}
+        server-username: OSS_SONATYPE_USERNAME
+        server-password: OSS_SONATYPE_PASSWORD
+    - name: Set version ${{ needs.publishing_parameters.outputs.version }}
+      run: mvn ${MAVEN_ARGS} versions:set -DnewVersion=${{ needs.publishing_parameters.outputs.version }}
     - name: Build with Maven
-      run: mvn -B verify
+      env:
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
+        OSS_SONATYPE_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
+      run: mvn ${MAVEN_ARGS} deploy
