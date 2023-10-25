@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import static no.rune.record.matcher.ExpectedMatcher.expectedMatcherFor;
 import static no.rune.record.matcher.example.singlestring.SingleStringRecordMatcher.aSingleStringRecord;
-import static no.rune.record.matcher.example.singlestring.SingleStringRecordMatcher.singleStringRecordWithValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
@@ -28,14 +27,14 @@ class SingleStringRecordMatcherTest {
 
     @Test
     void matchesRecordWithValue() {
-        assertThat(new SingleStringRecord("x"), singleStringRecordWithValue("x"));
-        assertThat(new SingleStringRecord(null), singleStringRecordWithValue(nullValue()));
-        assertThat(new SingleStringRecord(null), singleStringRecordWithValue((String) null));
+        assertThat(new SingleStringRecord("x"), aSingleStringRecord().withValue("x"));
+        assertThat(new SingleStringRecord(null), aSingleStringRecord().withValue(nullValue()));
+        assertThat(new SingleStringRecord(null), aSingleStringRecord().withValue((String) null));
     }
 
     @Test
     void doesNotMatchRecordWithUnexpectedValue() {
-        var assertionError = assertThrows(AssertionError.class, () -> assertThat(new SingleStringRecord("x"), singleStringRecordWithValue("y")));
+        var assertionError = assertThrows(AssertionError.class, () -> assertThat(new SingleStringRecord("x"), aSingleStringRecord().withValue("y")));
         assertThat(assertionError, where(AssertionError::getMessage,
                 containsString(SingleStringRecord.class.getSimpleName() + " record where value is \"y\"\n     but: value was \"x\"")));
     }

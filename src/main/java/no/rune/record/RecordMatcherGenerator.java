@@ -49,12 +49,12 @@ public class RecordMatcherGenerator {
                 .addStatement("this.$N = $N", matcherField.name, constructorMatcherParam.name);
 
             MethodSpec withComponentMatchingMethod = codeFactory
-                    .newStaticFactoryMethod(mapCharAt(0, record.getSimpleName(), Character::toLowerCase) + "With" + mapCharAt(0, component.componentName(), Character::toUpperCase))
+                    .newBuilderLikeMethod("with" + mapCharAt(0, component.componentName(), Character::toUpperCase))
                     .addParameter(constructorMatcherParam)
-                    .addStatement("return $L", codeFactory.constructorInvocation(Map.of(component.recordComponent, CodeBlock.of(constructorMatcherParam.name))))
+                    .addStatement("return $L", codeFactory.incrementalConstructorInvocation(component.recordComponent, CodeBlock.of(constructorMatcherParam.name)))
                     .build();
             MethodSpec withComponentEqualToMethod = codeFactory
-                    .newStaticFactoryMethod(mapCharAt(0, record.getSimpleName(), Character::toLowerCase) + "With" + mapCharAt(0, component.componentName(), Character::toUpperCase))
+                    .newBuilderLikeMethod("with" + mapCharAt(0, component.componentName(), Character::toUpperCase))
                     .addParameter(component.componentType(), component.componentName())
                     .addCode("return " + withComponentMatchingMethod.name + "($T.is(" + component.componentName() + "));", Matchers.class)
                     .build();

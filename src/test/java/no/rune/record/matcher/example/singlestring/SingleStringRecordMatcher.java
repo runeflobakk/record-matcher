@@ -17,12 +17,11 @@ public final class SingleStringRecordMatcher extends TypeSafeDiagnosingMatcher<S
         return new SingleStringRecordMatcher(new IsAnything<>("any value"));
     }
 
-    public static SingleStringRecordMatcher singleStringRecordWithValue(String value) {
-        return singleStringRecordWithValue(Matchers.is(value));
+    public SingleStringRecordMatcher withValue(String value) {
+        return withValue(Matchers.is(value));
     }
 
-    public static SingleStringRecordMatcher singleStringRecordWithValue(
-            Matcher<? super String> valueMatcher) {
+    public SingleStringRecordMatcher withValue(Matcher<? super String> valueMatcher) {
         return new SingleStringRecordMatcher(valueMatcher);
     }
 

@@ -45,6 +45,10 @@ final class CodeFactory {
             return recordComponent.getGenericType();
         }
 
+        boolean isFor(RecordComponent component) {
+            return recordComponent.equals(component);
+        }
+
         TypeName matcherValueType() {
             TypeName typeName = TypeName.get(recordComponent.getGenericType());
             return typeName.isPrimitive() ? typeName.box() : typeName;
@@ -54,8 +58,12 @@ final class CodeFactory {
             return ParameterizedTypeName.get(HAMCREST_MATCHER_CLASSNAME, supertypeOf(matcherValueType()));
         }
 
+        String matcherFieldName() {
+            return recordComponent.getName() + "Matcher";
+        }
+
         FieldSpec newMatcherField() {
-            return FieldSpec.builder(matcherType(), recordComponent.getName() + "Matcher")
+            return FieldSpec.builder(matcherType(), matcherFieldName())
                     .addModifiers(PRIVATE, FINAL)
                     .build();
         }
@@ -87,6 +95,10 @@ final class CodeFactory {
                 .superclass(ParameterizedTypeName.get(TypeSafeDiagnosingMatcher.class, record));
     }
 
+    MethodSpec.Builder newBuilderLikeMethod(String methodName) {
+        return MethodSpec.methodBuilder(methodName).addModifiers(PUBLIC).returns(matcherClass);
+    }
+
     MethodSpec.Builder newStaticFactoryMethod(String methodName) {
         return MethodSpec.methodBuilder(methodName).addModifiers(PUBLIC, STATIC).returns(matcherClass);
     }
@@ -109,6 +121,10 @@ final class CodeFactory {
 
     CodeBlock constructorInvocation(Map<RecordComponent, CodeBlock> componentMatchers) {
         return CodeBlock.of("new $T($L)", matcherClass, constructorArgs(componentMatchers).collect(CodeBlock.joining(", ")));
+    }
+
+    CodeBlock incrementalConstructorInvocation(RecordComponent component, CodeBlock componentMatcher) {
+        return constructorInvocation(components().collect(toMap(c -> c.recordComponent, c -> c.isFor(component) ? componentMatcher : CodeBlock.of("this." + c.matcherFieldName()))));
     }
 
 }

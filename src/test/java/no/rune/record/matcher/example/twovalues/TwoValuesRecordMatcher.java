@@ -21,22 +21,20 @@ public final class TwoValuesRecordMatcher extends TypeSafeDiagnosingMatcher<TwoV
         return new TwoValuesRecordMatcher(new IsAnything<>("any text"), new IsAnything<>("any number"));
     }
 
-    public static TwoValuesRecordMatcher twoValuesRecordWithText(String text) {
-        return twoValuesRecordWithText(Matchers.is(text));
+    public TwoValuesRecordMatcher withText(String text) {
+        return withText(Matchers.is(text));
     }
 
-    public static TwoValuesRecordMatcher twoValuesRecordWithText(
-            Matcher<? super String> textMatcher) {
-        return new TwoValuesRecordMatcher(textMatcher, new IsAnything<>("any number"));
+    public TwoValuesRecordMatcher withText(Matcher<? super String> textMatcher) {
+        return new TwoValuesRecordMatcher(textMatcher, this.numberMatcher);
     }
 
-    public static TwoValuesRecordMatcher twoValuesRecordWithNumber(int number) {
-        return twoValuesRecordWithNumber(Matchers.is(number));
+    public TwoValuesRecordMatcher withNumber(int number) {
+        return withNumber(Matchers.is(number));
     }
 
-    public static TwoValuesRecordMatcher twoValuesRecordWithNumber(
-            Matcher<? super Integer> numberMatcher) {
-        return new TwoValuesRecordMatcher(new IsAnything<>("any text"), numberMatcher);
+    public TwoValuesRecordMatcher withNumber(Matcher<? super Integer> numberMatcher) {
+        return new TwoValuesRecordMatcher(this.textMatcher, numberMatcher);
     }
 
     @Override
