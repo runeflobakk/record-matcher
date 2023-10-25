@@ -3,7 +3,7 @@ package no.rune.record.matcher.example.twovalues;
 import org.junit.jupiter.api.Test;
 
 import static no.rune.record.matcher.ExpectedMatcher.expectedMatcherFor;
-import static no.rune.record.matcher.example.twovalues.TwoValuesRecordMatcher.anyTwoValuesRecord;
+import static no.rune.record.matcher.example.twovalues.TwoValuesRecordMatcher.aTwoValuesRecord;
 import static no.rune.record.matcher.example.twovalues.TwoValuesRecordMatcher.twoValuesRecordWithNumber;
 import static no.rune.record.matcher.example.twovalues.TwoValuesRecordMatcher.twoValuesRecordWithText;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,15 +17,15 @@ class TwoValuesRecordMatcherTest {
 
     @Test
     void doesNotMatchNull() {
-        var assertionError = assertThrows(AssertionError.class, () -> assertThat(null, anyTwoValuesRecord()));
+        var assertionError = assertThrows(AssertionError.class, () -> assertThat(null, aTwoValuesRecord()));
         assertThat(assertionError, where(AssertionError::getMessage,
                 containsString("any " + TwoValuesRecord.class.getSimpleName() + " record\n     but: was null")));
     }
 
     @Test
     void matchesAnyRecord() {
-        assertThat(new TwoValuesRecord("x", 0), anyTwoValuesRecord());
-        assertThat(new TwoValuesRecord(null, 0), anyTwoValuesRecord());
+        assertThat(new TwoValuesRecord("x", 0), aTwoValuesRecord());
+        assertThat(new TwoValuesRecord(null, 0), aTwoValuesRecord());
     }
 
     @Test

@@ -17,7 +17,7 @@ public final class TwoValuesRecordMatcher extends TypeSafeDiagnosingMatcher<TwoV
         this.numberMatcher = numberMatcher;
     }
 
-    public static TwoValuesRecordMatcher anyTwoValuesRecord() {
+    public static TwoValuesRecordMatcher aTwoValuesRecord() {
         return new TwoValuesRecordMatcher(new IsAnything<>("any text"), new IsAnything<>("any number"));
     }
 

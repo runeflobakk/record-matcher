@@ -3,7 +3,7 @@ package no.rune.record.matcher.example.singlestring;
 import org.junit.jupiter.api.Test;
 
 import static no.rune.record.matcher.ExpectedMatcher.expectedMatcherFor;
-import static no.rune.record.matcher.example.singlestring.SingleStringRecordMatcher.anySingleStringRecord;
+import static no.rune.record.matcher.example.singlestring.SingleStringRecordMatcher.aSingleStringRecord;
 import static no.rune.record.matcher.example.singlestring.SingleStringRecordMatcher.singleStringRecordWithValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -15,15 +15,15 @@ class SingleStringRecordMatcherTest {
 
     @Test
     void doesNotMatchNull() {
-        var assertionError = assertThrows(AssertionError.class, () -> assertThat(null, anySingleStringRecord()));
+        var assertionError = assertThrows(AssertionError.class, () -> assertThat(null, aSingleStringRecord()));
         assertThat(assertionError, where(AssertionError::getMessage,
                 containsString("any " + SingleStringRecord.class.getSimpleName() + " record\n     but: was null")));
     }
 
     @Test
     void matchesAnyRecord() {
-        assertThat(new SingleStringRecord("x"), anySingleStringRecord());
-        assertThat(new SingleStringRecord(null), anySingleStringRecord());
+        assertThat(new SingleStringRecord("x"), aSingleStringRecord());
+        assertThat(new SingleStringRecord(null), aSingleStringRecord());
     }
 
     @Test

@@ -17,7 +17,9 @@ import static com.squareup.javapoet.TypeName.BOOLEAN;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PROTECTED;
 import static javax.lang.model.element.Modifier.PUBLIC;
+import static no.rune.text.Affixing.withIndefArticle;
 import static no.rune.text.Casing.mapCharAt;
+import static no.rune.text.Casing.Style.camelCase;
 
 public class RecordMatcherGenerator {
 
@@ -30,7 +32,7 @@ public class RecordMatcherGenerator {
         var codeFactory = new CodeFactory(record, ClassName.get(target.getName(), matcherSimpleClassName));
 
         var anyRecordFactoryMethodBuilder = codeFactory
-                .newStaticFactoryMethod("any" + record.getSimpleName())
+                .newStaticFactoryMethod(withIndefArticle(record.getSimpleName(), camelCase))
                 .addStatement("return $L", codeFactory.defaultConstructorInvocation());
 
         var matcherClassBuilder = codeFactory.newMatcherClass()

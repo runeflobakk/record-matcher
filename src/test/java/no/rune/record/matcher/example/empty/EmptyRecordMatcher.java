@@ -7,7 +7,7 @@ public final class EmptyRecordMatcher extends TypeSafeDiagnosingMatcher<EmptyRec
     private EmptyRecordMatcher() {
     }
 
-    public static EmptyRecordMatcher anyEmptyRecord() {
+    public static EmptyRecordMatcher anEmptyRecord() {
         return new EmptyRecordMatcher();
     }
 

@@ -13,7 +13,7 @@ public final class SingleStringRecordMatcher extends TypeSafeDiagnosingMatcher<S
         this.valueMatcher = valueMatcher;
     }
 
-    public static SingleStringRecordMatcher anySingleStringRecord() {
+    public static SingleStringRecordMatcher aSingleStringRecord() {
         return new SingleStringRecordMatcher(new IsAnything<>("any value"));
     }
 
