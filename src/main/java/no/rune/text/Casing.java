@@ -6,8 +6,8 @@ import java.util.function.IntUnaryOperator;
 public final class Casing {
 
     public enum Style {
-        camelCase((s, i) -> mapCharAt(0, s, i != 0 ? Character::toLowerCase : Character::toUpperCase) + s.substring(1).toLowerCase()),
-        PascalCase((s, i) -> mapCharAt(0, s, Character::toUpperCase) + s.substring(1).toLowerCase()),
+        camelCase((s, i) -> i == 0 ? mapCharAt(0, s, Character::toLowerCase) : mapCharAt(0, s, Character::toUpperCase)),
+        PascalCase((s, i) -> mapCharAt(0, s, Character::toUpperCase)),
         snake_case((s, i) -> s.toLowerCase(), "_"),
         CAPITALIZED_SNAKE_CASE((s, i) -> s.toUpperCase(), "_");
 
@@ -26,6 +26,8 @@ public final class Casing {
             this.delimiter = delimiter;
             this.tokenMapper = wordMapper;
         }
+
+
     }
 
     public static String to(Style style, String ... tokens) {
