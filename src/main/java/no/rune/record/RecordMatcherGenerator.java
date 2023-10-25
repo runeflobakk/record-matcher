@@ -123,7 +123,7 @@ public class RecordMatcherGenerator {
             .map(component -> CodeBlock.builder().addNamed(
                     """
                     if (!$matcherReference:N.matches(element.$componentName:N())) {
-                        mismatchDescription.appendText("$componentName:N ");
+                        mismatchDescription.appendText(" $componentName:N ");
                         $matcherReference:N.describeMismatch(element.$componentName:N(), mismatchDescription);
                         matches = false;
                     }

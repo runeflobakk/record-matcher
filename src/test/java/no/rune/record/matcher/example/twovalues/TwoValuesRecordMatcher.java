@@ -57,12 +57,12 @@ public final class TwoValuesRecordMatcher extends TypeSafeDiagnosingMatcher<TwoV
     protected boolean matchesSafely(TwoValuesRecord element, Description mismatchDescription) {
         boolean matches = true;
         if (!textMatcher.matches(element.text())) {
-            mismatchDescription.appendText("text ");
+            mismatchDescription.appendText(" text ");
             textMatcher.describeMismatch(element.text(), mismatchDescription);
             matches = false;
         }
         if (!numberMatcher.matches(element.number())) {
-            mismatchDescription.appendText("number ");
+            mismatchDescription.appendText(" number ");
             numberMatcher.describeMismatch(element.number(), mismatchDescription);
             matches = false;
         }

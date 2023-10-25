@@ -42,7 +42,7 @@ public final class SingleStringRecordMatcher extends TypeSafeDiagnosingMatcher<S
     protected boolean matchesSafely(SingleStringRecord element, Description mismatchDescription) {
         boolean matches = true;
         if (!valueMatcher.matches(element.value())) {
-            mismatchDescription.appendText("value ");
+            mismatchDescription.appendText(" value ");
             valueMatcher.describeMismatch(element.value(), mismatchDescription);
             matches = false;
         }

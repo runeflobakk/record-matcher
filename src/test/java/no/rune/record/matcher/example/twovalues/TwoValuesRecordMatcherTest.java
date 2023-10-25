@@ -48,7 +48,14 @@ class TwoValuesRecordMatcherTest {
     void doesNotMatchRecordWithUnexpectedValue() {
         var assertionError = assertThrows(AssertionError.class, () -> assertThat(new TwoValuesRecord("x", 0), aTwoValuesRecord().withText("y")));
         assertThat(assertionError, where(AssertionError::getMessage,
-                containsString(TwoValuesRecord.class.getSimpleName() + " record where text is \"y\"\n     but: text was \"x\"")));
+                containsString(TwoValuesRecord.class.getSimpleName() + " record where text is \"y\"\n     but:  text was \"x\"")));
+    }
+
+    @Test
+    void doesNotMatchRecordWithTwoUnexpectedValues() {
+        var assertionError = assertThrows(AssertionError.class, () -> assertThat(new TwoValuesRecord("x", 0), aTwoValuesRecord().withText(containsString("y")).withNumber(2)));
+        assertThat(assertionError, where(AssertionError::getMessage,
+                containsString(TwoValuesRecord.class.getSimpleName() + " record where text a string containing \"y\" number is <2>\n     but:  text was \"x\" number was <0>")));
     }
 
     @Test

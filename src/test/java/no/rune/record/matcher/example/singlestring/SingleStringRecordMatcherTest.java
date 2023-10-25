@@ -36,7 +36,7 @@ class SingleStringRecordMatcherTest {
     void doesNotMatchRecordWithUnexpectedValue() {
         var assertionError = assertThrows(AssertionError.class, () -> assertThat(new SingleStringRecord("x"), aSingleStringRecord().withValue("y")));
         assertThat(assertionError, where(AssertionError::getMessage,
-                containsString(SingleStringRecord.class.getSimpleName() + " record where value is \"y\"\n     but: value was \"x\"")));
+                containsString(SingleStringRecord.class.getSimpleName() + " record where value is \"y\"\n     but:  value was \"x\"")));
     }
 
     @Test
