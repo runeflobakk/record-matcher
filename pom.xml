@@ -5,12 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.runeflobakk</groupId>
-    <artifactId>record-matcher</artifactId>
+    <artifactId>record-matcher-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <name>Record Matcher</name>
-    <description>Generates Hamcrest matchers for Java records</description>
+    <name>Record Matcher Parent POM</name>
+    <description>Parent POM for Record Matcher</description>
     <url>https://github.com/runeflobakk/record-matcher</url>
+
+    <modules>
+        <module>generator</module>
+    </modules>
 
     <licenses>
         <license>
@@ -34,38 +39,18 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.co.probablyfine</groupId>
+                <artifactId>java-8-matchers</artifactId>
+                <version>1.9</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
-            <version>1.13.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <version>2.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>uk.co.probablyfine</groupId>
-            <artifactId>java-8-matchers</artifactId>
-            <version>1.9</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.testing.compile</groupId>
-            <artifactId>compile-testing</artifactId>
-            <version>0.19</version>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
