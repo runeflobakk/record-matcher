@@ -15,6 +15,7 @@
 
     <modules>
         <module>generator</module>
+        <module>maven-plugin</module>
     </modules>
 
     <licenses>
