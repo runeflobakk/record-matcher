@@ -28,14 +28,36 @@ import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
 public class GenerateRecordMatcherMojo extends AbstractMojo {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenerateRecordMatcherMojo.class);
+    private static final String PLUGIN_CONF_PROP_PREFIX = "recordmatcher.";
 
+    /**
+     * Specifies the fully qualified class names of the records to
+     * generate Hamcrest matchers for.
+     */
     @Parameter
     private Set<String> includes;
 
-    @Parameter(defaultValue = "${project.build.directory}/generated-test-sources/record-matchers", required = true)
+
+    /**
+     * The directory where the generated Hamcrest matchers will be written to.
+     */
+    @Parameter(required = true,
+            defaultValue = "${project.build.directory}/generated-test-sources/record-matchers",
+            property = PLUGIN_CONF_PROP_PREFIX + "outputDirectory")
     private File outputDirectory;
 
-    @Parameter(defaultValue = "${project}", required = true, readonly = true)
+
+    /**
+     * Whether the {@link #outputDirectory} should be included as a test sources root.
+     */
+    @Parameter(required = true,
+            defaultValue = "true",
+            property = PLUGIN_CONF_PROP_PREFIX + "includeGeneratedCodeAsTestSources")
+    private boolean includeGeneratedCodeAsTestSources;
+
+
+    @Parameter(required = true, readonly = true,
+            defaultValue = "${project}")
     private MavenProject mavenProject;
 
 
@@ -43,6 +65,10 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (includes != null && !includes.isEmpty()) {
             Path outputDirectory = resolveOutputDirectory();
+            if (includeGeneratedCodeAsTestSources) {
+                mavenProject.addTestCompileSourceRoot(outputDirectory.toString());
+                LOG.debug("{} has been added as a compiler test sources directory", outputDirectory);
+            }
             try {
                 Files.createDirectories(outputDirectory);
                 LOG.info("Generating Hamcrest matchers in {}", outputDirectory);
