@@ -13,6 +13,7 @@
     <packaging>maven-plugin</packaging>
 
     <name>Record Matcher Generator Maven Plugin</name>
+    <description>Maven plugin for generating Hamcrest matchers for Java records</description>
 
     <properties>
         <maven.plugin-tools.version>3.10.2</maven.plugin-tools.version>
