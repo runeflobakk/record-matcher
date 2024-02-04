@@ -1,8 +1,76 @@
+![Maven Central Version](https://img.shields.io/maven-central/v/com.github.runeflobakk/record-matcher-maven-plugin)
+
+
 # Record Matcher Generator
 
 A library and plugin for Maven to generate source code for [Hamcrest Matchers](https://hamcrest.org/JavaHamcrest/) for [Java records](https://openjdk.org/jeps/395). The generated matchers provide an API to incrementally constrain how specific you want to express what your expectations are in test. reflecting the names of both the record itself as well as its components (i.e. fields)
 
 This project is currently in its infancy, but should still be usable. You are most welcome to play around with it, and I appreciate any feedback you may have!
+
+
+## Getting started
+
+Likely, you want to use this via the Maven plugin, and this is how you would set that up in your `pom.xml`:
+
+
+```xml
+<build>
+	<plugins>
+		<plugin>
+			<groupId>com.github.runeflobakk</groupId>
+			<artifactId>record-matcher-maven-plugin</artifactId>
+			<version>0.1.0</version> <!-- replace with any newer version -->
+			<configuration>
+				<includes>
+					<!--
+					For now, the records for which you want matchers generated needs to be enumerated.
+					An automated discovery facility is planned for later.
+					-->
+					<include>your.domain.SomeRecord</include>
+					<include>your.domain.sub.SomeOtherRecord</include>
+				</includes>
+			</configuration>
+			<executions>
+				<execution>
+					<goals>
+						<goal>generate</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+		...
+```
+Or separate the execution binding and configuration by putting the configuration into `pluginManagement`, if you prefer.
+
+The configuration above will generate the source code for `SomeRecordMatcher` and `SomeOtherRecordMatcher` and put them in `target/generated-test-sources/record-matchers` in the corresponding packages as each record they match on.
+
+The plugin will itself include the folder where it generates code as a test source root for the compiler. If your IDE is able to resolve source folders automatically based on any `build-helper-maven-plugin` configuration, you may also want to include this:
+
+```xml
+<plugin>
+	<groupId>org.codehaus.mojo</groupId>
+	<artifactId>build-helper-maven-plugin</artifactId>
+	<version>3.5.0</version>
+	<executions>
+		<execution>
+			<id>include-record-matchers</id>
+			<goals>
+				<goal>add-test-source</goal>
+			</goals>
+			<configuration>
+				<sources>
+					<source>target/generated-test-sources/record-matchers</source>
+				</sources>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+```
+
+Eclipse detects this, and to my knowledge IntelliJ should also support this. Alternatively, you will need to manually add `target/generated-test-sources/record-matchers` as a test source folder for your project in your IDE.
+
+After running a build, or `mvn generate-test-sources`, you should be able to see the generated Matcher classes in your IDE. The example given above would make a `SomeRecordMatcher` and `SomeOtherRecordMatcher` available (substitute with your own record(s)), and their static factory methods `SomeRecordMatcher.aSomeRecord()` and `SomeOtherRecordMatcher.aSomeOtherRecord()` which should provide their APIs via method chaining; you get autocompletion by typing `.` after the static factory method.
+
 
 
 ## Use cases
