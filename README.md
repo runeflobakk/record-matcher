@@ -3,9 +3,30 @@
 
 # Record Matcher Generator
 
-A library and plugin for Maven to generate source code for [Hamcrest Matchers](https://hamcrest.org/JavaHamcrest/) for [Java records](https://openjdk.org/jeps/395). The generated matchers provide an API to incrementally constrain how specific you want to express what your expectations are in test. reflecting the names of both the record itself as well as its components (i.e. fields)
+A library and plugin for Maven to generate source code for [Hamcrest Matchers](https://hamcrest.org/JavaHamcrest/) for [Java records](https://openjdk.org/jeps/395). The API of the generated matchers reflect the names of both the record itself as well as its components (i.e. fields), and provide facilities to incrementally constrain how specific you want to express what your expectations are.
 
 This project is currently in its infancy, but should still be usable. You are most welcome to play around with it, and I appreciate any feedback you may have!
+
+## Example
+
+```java
+record Book (String title, List<Author> authors, int pageCount, Publisher publisher) { }
+```
+
+Given you have defined the record above in your domain, this library can generate a `BookMatcher` which can be used like this:
+
+```java
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static your.domain.BookMatcher.aBook();
+...
+
+assertThat(book, is(aBook().withTitle("Effective Java").withAuthors(not(empty()))));
+
+List<Book> effectiveSeries = // resolve Effective Xyz series of books
+assertThat(effectiveSeries, everyItem(aBook().withTitle(containsString("Effective"))));
+```
+
 
 
 ## Getting started
