@@ -40,7 +40,7 @@ Likely, you want to use this via the Maven plugin, and this is how you would set
 		<plugin>
 			<groupId>com.github.runeflobakk</groupId>
 			<artifactId>record-matcher-maven-plugin</artifactId>
-			<version>0.1.0</version> <!-- replace with any newer version -->
+			<version>0.2.0</version> <!-- replace with any newer version -->
 			<configuration>
 				<includes>
 					<!--
