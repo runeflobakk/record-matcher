@@ -1,4 +1,4 @@
-package no.rune.record;
+package no.rune.record.matcher;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;

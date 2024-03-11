@@ -1,4 +1,4 @@
-package no.rune.record;
+package no.rune.record.matcher;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;

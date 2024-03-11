@@ -1,4 +1,4 @@
-package no.rune.record;
+package no.rune.record.matcher;
 
 final class DefaultRecordMatcherClassNameResolver implements RecordMatcherClassNameResolver {
 

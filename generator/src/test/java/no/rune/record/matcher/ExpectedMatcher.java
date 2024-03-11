@@ -2,7 +2,6 @@ package no.rune.record.matcher;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
-import no.rune.record.RecordMatcherGenerator;
 
 import java.io.IOException;
 import java.nio.file.Path;

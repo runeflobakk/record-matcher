@@ -1,7 +1,7 @@
-package no.rune.record;
+package no.rune.record.matcher;
 
 @FunctionalInterface
-public interface RecordMatcherClassNameResolver {
+interface RecordMatcherClassNameResolver {
 
     String resolve(Class<? extends Record> record);
 
