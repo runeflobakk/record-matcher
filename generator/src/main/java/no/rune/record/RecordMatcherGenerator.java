@@ -23,8 +23,10 @@ import static no.rune.text.Casing.Style.camelCase;
 
 public class RecordMatcherGenerator {
 
+    public static final RecordMatcherClassNameResolver DEFAULT_MATCHER_NAME_RESOLVER = new DefaultRecordMatcherClassNameResolver();
+
     public String generateFromRecord(Class<? extends Record> record) {
-        return generateFromRecord(record, record.getPackage(), record.getSimpleName() + "Matcher");
+        return generateFromRecord(record, record.getPackage(), DEFAULT_MATCHER_NAME_RESOLVER.resolve(record));
     }
 
     public String generateFromRecord(Class<? extends Record> record, Package target, String matcherSimpleClassName) {

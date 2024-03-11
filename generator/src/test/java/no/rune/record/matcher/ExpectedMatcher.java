@@ -21,7 +21,7 @@ import static uk.co.probablyfine.matchers.Java8Matchers.where;
 public record ExpectedMatcher(String fullyQualifiedClassName, String sourceCode, Class<? extends Record> record) {
 
     public static ExpectedMatcher expectedMatcherFor(Class<? extends Record> record) {
-        String fullyQualifiedMatcherClassName = record.getName() + "Matcher";
+        String fullyQualifiedMatcherClassName = record.getPackageName() + "." + RecordMatcherGenerator.DEFAULT_MATCHER_NAME_RESOLVER.resolve(record);
         Path expectedMatcherSourceFile = javaTestSourceFiles.resolve(fullyQualifiedMatcherClassName.replaceAll("\\.", "/") + ".java");
         try {
             return new ExpectedMatcher(fullyQualifiedMatcherClassName, readString(expectedMatcherSourceFile), record);
