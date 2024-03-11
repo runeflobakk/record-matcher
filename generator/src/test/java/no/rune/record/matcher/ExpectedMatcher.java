@@ -33,15 +33,15 @@ public record ExpectedMatcher(String fullyQualifiedClassName, String sourceCode,
 
     private static final RecordMatcherGenerator generator = new RecordMatcherGenerator();
 
-    public String generatedSourceCode() {
+    public JavaCompilationUnit generatedSourceCode() {
         return generator.generateFromRecord(record());
     }
 
     public void assertEqualToGeneratedMatcherSourceCode() {
         var generatedSourceCode = generatedSourceCode();
-        assertEquals(sourceCode(), generatedSourceCode);
+        assertEquals(sourceCode(), generatedSourceCode.content());
 
-        var compiledGeneratedMatcher = javac().compile(JavaFileObjects.forSourceString(fullyQualifiedClassName(), generatedSourceCode));
+        var compiledGeneratedMatcher = javac().compile(JavaFileObjects.forSourceString(fullyQualifiedClassName(), generatedSourceCode.content()));
         assertAll(
                 () -> assertThat(compiledGeneratedMatcher, where(Compilation::status, is(SUCCESS))),
                 () -> assertThat(compiledGeneratedMatcher, where(Compilation::errors, empty())));

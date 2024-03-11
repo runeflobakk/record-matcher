@@ -79,17 +79,15 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
             }
             var generator = new RecordMatcherGenerator();
             resolveIncludedRecords().forEach(recordClass -> {
-                var recordMatcherSourceCode = generator.generateFromRecord(recordClass);
-                var matcherClassFileTargetDirectory = outputDirectory.resolve(Path.of(recordClass.getPackageName().replace('.', '/')));
-                var matcherTargetFile = matcherClassFileTargetDirectory.resolve(recordClass.getSimpleName() + "Matcher.java");
+                var recordMatcherCompilationUnit = generator.generateFromRecord(recordClass);
                 try {
-                    Files.createDirectories(matcherClassFileTargetDirectory);
-                    Files.writeString(matcherTargetFile, recordMatcherSourceCode);
+                    var writtenFile = recordMatcherCompilationUnit.writeToBaseDirectory(outputDirectory);
+                    LOG.info("Generated matcher {}", outputDirectory.relativize(writtenFile));
                 } catch (IOException e) {
-                    throw new UncheckedIOException("Unable to write to " + matcherTargetFile + ", " +
+                    throw new UncheckedIOException(
+                            "Unable to write " + recordMatcherCompilationUnit + " to file, " +
                             "because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
                 }
-                LOG.info("Generated matcher {}", outputDirectory.relativize(matcherTargetFile));
             });
         } else {
             LOG.warn("No records to generate Hamcrest matchers from!");

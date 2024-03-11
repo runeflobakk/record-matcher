@@ -1,6 +1,5 @@
 package no.rune.record.matcher;
 
-import no.rune.record.matcher.DefaultRecordMatcherClassNameResolver;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

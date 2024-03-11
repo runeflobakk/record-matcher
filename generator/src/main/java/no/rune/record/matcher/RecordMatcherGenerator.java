@@ -25,11 +25,11 @@ public class RecordMatcherGenerator {
 
     public static final RecordMatcherClassNameResolver DEFAULT_MATCHER_NAME_RESOLVER = new DefaultRecordMatcherClassNameResolver();
 
-    public String generateFromRecord(Class<? extends Record> record) {
+    public JavaCompilationUnit generateFromRecord(Class<? extends Record> record) {
         return generateFromRecord(record, record.getPackage(), DEFAULT_MATCHER_NAME_RESOLVER.resolve(record));
     }
 
-    public String generateFromRecord(Class<? extends Record> record, Package target, String matcherSimpleClassName) {
+    public JavaCompilationUnit generateFromRecord(Class<? extends Record> record, Package target, String matcherSimpleClassName) {
 
         var codeFactory = new CodeFactory(record, ClassName.get(target.getName(), matcherSimpleClassName));
 
@@ -140,10 +140,11 @@ public class RecordMatcherGenerator {
             .addMethod(matchesSafelyMethodBuilder.build());
 
 
-        return JavaFile.builder(target.getName(), matcherClassBuilder.build())
+        String compilationUnitContent = JavaFile.builder(target.getName(), matcherClassBuilder.build())
                 .indent("    ")
                 .skipJavaLangImports(true)
                 .build().toString();
+        return new JavaCompilationUnit(compilationUnitContent, matcherSimpleClassName, target);
     }
 
 
