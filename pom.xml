@@ -98,8 +98,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -124,13 +124,12 @@
                     <version>3.2.8</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.13</version>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.9.0</version>
                     <extensions>true</extensions>
                     <configuration>
-                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                        <serverId>sonatype-nexus-staging</serverId>
+                        <publishingServerId>central</publishingServerId>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -194,14 +193,6 @@
             </roles>
         </developer>
     </developers>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <scm>
         <connection>scm:git:git@github.com:runeflobakk/record-matcher.git</connection>
