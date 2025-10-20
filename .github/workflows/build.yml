@@ -10,50 +10,42 @@ jobs:
     name: Publishing parameters
     runs-on: ubuntu-latest
     outputs:
-      distribution_server_id: ${{ steps.version.outputs.distribution_server_id }}
-      is_release: ${{ steps.version.outputs.is_release }}
       version: ${{ steps.version.outputs.version }}
     steps:
       - name: Determine version
         id: version
         run: |
           if [[ $GITHUB_REF == *"tags"* ]]; then
-            distribution_server_id='sonatype-nexus-staging'
-            is_release=true
             version=${GITHUB_REF#refs/tags/}
           else
-            distribution_server_id='sonatype-nexus-snapshots'
-            is_release=false
             version=${GITHUB_REF#refs/heads/}-SNAPSHOT
           fi
-          echo "is_release=${is_release//\//-}" >> $GITHUB_OUTPUT
           echo "version=${version//\//-}" >> $GITHUB_OUTPUT
-          echo "distribution_server_id=${distribution_server_id//\//-}" >> $GITHUB_OUTPUT
 
   build:
-    name: Build ${{ needs.publishing_parameters.outputs.version }} and publish to ${{ needs.publishing_parameters.outputs.distribution_server_id }}
+    name: Build ${{ needs.publishing_parameters.outputs.version }} and publish to Maven Central
     needs: publishing_parameters
     runs-on: ubuntu-latest
     env:
       MAVEN_ARGS: --show-version --no-transfer-progress
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
-        java-version: '17'
         distribution: 'temurin'
+        java-version-file: '.java-version'
         cache: maven
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
-        server-id: ${{ needs.publishing_parameters.outputs.distribution_server_id }}
-        server-username: OSS_SONATYPE_USERNAME
-        server-password: OSS_SONATYPE_PASSWORD
+        server-id: central
+        server-username: MAVEN_CENTRAL_PUBLISH_USERNAME
+        server-password: MAVEN_CENTRAL_PUBLISH_PASSWORD
     - name: Set version ${{ needs.publishing_parameters.outputs.version }}
-      run: mvn ${MAVEN_ARGS} versions:set -DnewVersion=${{ needs.publishing_parameters.outputs.version }}
+      run: mvn versions:set -DnewVersion=${{ needs.publishing_parameters.outputs.version }}
     - name: Build with Maven
       env:
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-        OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
-        OSS_SONATYPE_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
-      run: mvn ${MAVEN_ARGS} deploy
+        MAVEN_CENTRAL_PUBLISH_USERNAME: ${{ secrets.MAVEN_CENTRAL_PUBLISH_USERNAME }}
+        MAVEN_CENTRAL_PUBLISH_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PUBLISH_PASSWORD }}
+      run: mvn clean deploy
