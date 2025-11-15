@@ -7,18 +7,18 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
-import org.hamcrest.core.IsAnything;
-
 import java.lang.reflect.RecordComponent;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
+import org.hamcrest.core.IsAnything;
 
 import static com.squareup.javapoet.WildcardTypeName.supertypeOf;
+import static java.lang.reflect.Modifier.isPrivate;
 import static java.util.Collections.emptyMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -78,9 +78,11 @@ final class CodeFactory {
     private final Map<RecordComponent, CodeBlock> defaultComponentMatchers;
 
     CodeFactory(Class<? extends Record> record, ClassName matcherClass) {
-        this.defaultComponentMatchers = Stream.of(record.getRecordComponents()).collect(collectingAndThen(toMap(
-                identity(), CodeFactory::isAnythingMatcher,
-                (v1, v2) -> { throw new IllegalStateException("Got same index for " + v1 + " and " + v2); }, LinkedHashMap::new), Collections::unmodifiableMap));
+        this.defaultComponentMatchers = Stream.of(record.getRecordComponents())
+                .filter(c -> !isPrivate(c.getType().getModifiers()))
+                .collect(collectingAndThen(toMap(
+                    identity(), CodeFactory::isAnythingMatcher,
+                    (v1, v2) -> { throw new IllegalStateException("Got same index for " + v1 + " and " + v2); }, LinkedHashMap::new), Collections::unmodifiableMap));
         this.record = record;
         this.matcherClass = matcherClass;
     }
