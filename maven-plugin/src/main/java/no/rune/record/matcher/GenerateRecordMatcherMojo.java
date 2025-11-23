@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 import static java.util.stream.Stream.concat;
 import static no.rune.record.matcher.ScanHelper.isAccessibleFromSamePackage;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
@@ -59,6 +60,13 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
             defaultValue = "true",
             property = PLUGIN_CONF_PROP_PREFIX + "scanEnabled")
     private boolean scanEnabled;
+
+
+    /**
+     * Specifies records which are excluded for Matcher generating.
+     */
+    @Parameter
+    private Set<String> excludes;
 
 
     /**
@@ -176,7 +184,20 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
             configuredRecords = Stream.empty();
         }
 
-        return concat(scannedRecords, configuredRecords).distinct();
+        var foundRecords = concat(scannedRecords, configuredRecords).distinct();
+        if (excludes != null && !excludes.isEmpty()) {
+            var santizedExcludes = excludes.stream().filter(not(String::isBlank)).map(String::trim).collect(toUnmodifiableSet());
+            return foundRecords.filter(r -> {
+                if (santizedExcludes.contains(r.getName())) {
+                    LOG.info("Excluding record {}", r.getName());
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        } else {
+            return foundRecords;
+        }
     }
 
     private static Stream<Class<? extends Record>> scanForRecords(ClassLoader classLoader, Collection<String> packageNames) {
@@ -219,7 +240,7 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
             URL urls[] = new URL[classpathElements.size()];
             for ( int i = 0; i < classpathElements.size(); ++i )
             {
-                urls[i] = new File( classpathElements.get( i ) ).toURI().toURL();
+                urls[i] = new File(classpathElements.get( i ) ).toURI().toURL();
             }
             return new URLClassLoader(urls, parent);
         } catch (Exception e) {
