@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -152,7 +153,8 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
                 .distinct());
     }
 
-    private static Stream<Class<? extends Record>> scanForRecords(ClassLoader classLoader, Set<String> packageNames) {
+    private static Stream<Class<? extends Record>> scanForRecords(ClassLoader classLoader, Collection<String> packageNames) {
+        packageNames = packageNames.stream().filter(not(String::isBlank)).map(String::trim).distinct().toList();
         if (packageNames.isEmpty()) {
             LOG.debug("No packages configured for scanning");
             return Stream.empty();
