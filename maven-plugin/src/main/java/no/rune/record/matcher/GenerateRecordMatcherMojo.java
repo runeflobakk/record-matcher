@@ -47,14 +47,14 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
 
 
     /**
-     * Specify which packages (includes any sub packages) to scan for records
+     * Specify which packages (includes any sub packages) to scan for records.
      */
     @Parameter(defaultValue = "${project.groupId}")
     private Set<String> scanPackages;
 
 
     /**
-     * Set if scanning for records is enabled or not
+     * Set if scanning for records is enabled or not.
      */
     @Parameter(required = true,
             defaultValue = "true",
@@ -63,7 +63,8 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
 
 
     /**
-     * Specifies records which are excluded for Matcher generating.
+     * Specifies fully qualified class names of records to
+     * exclude from the Matcher generator.
      */
     @Parameter
     private Set<String> excludes;
