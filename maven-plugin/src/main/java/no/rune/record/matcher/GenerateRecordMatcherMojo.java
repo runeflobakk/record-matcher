@@ -46,6 +46,7 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
     @Parameter
     private Set<String> includes;
 
+
     /**
      * Specify which packages (includes any sub packages) to scan for records
      */
@@ -159,14 +160,20 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
             LOG.debug("No packages configured for scanning");
             return Stream.empty();
         }
+
         LOG.info("Scanning packages {} for records", packageNames);
-        var components = ComponentSupplier.getInstance();
         var allRecordsInClassLoader = SearchConfig.forResources(packageNames.stream().map(p -> p.replace('.', '/')).toList())
                 .by(ClassCriteria.create().allThoseThatMatch(cls -> cls.isRecord() && isAccessibleFromSamePackage(cls)))
                 .useAsParentClassLoader(classLoader);
 
-        try (var searchResult = components.getClassHunter().findBy(allRecordsInClassLoader)) {
+        var classHunter = ComponentSupplier.getInstance().getClassHunter();
+        try (var searchResult = classHunter.findBy(allRecordsInClassLoader)) {
             return searchResult.getClasses().stream().map(c -> c.asSubclass(Record.class));
+        } catch (RuntimeException e) {
+            throw new IllegalStateException(
+                    "There was an error scanning for records in package(s) " + packageNames + ": " +
+                    e.getClass().getSimpleName() + " '" + e.getMessage() + "'. Ensure that the packages " +
+                    "are correctly defined and exists.", e);
         }
     }
 
