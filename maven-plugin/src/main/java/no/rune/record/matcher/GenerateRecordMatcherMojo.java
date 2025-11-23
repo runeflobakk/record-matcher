@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toUnmodifiableSet;
@@ -88,6 +89,14 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
     private boolean includeGeneratedCodeAsTestSources;
 
 
+    /**
+     * Project packaging types where execution is skipped.
+     */
+    @Parameter(required = true,
+            defaultValue = "pom")
+    private Set<String> skipForPackaging;
+
+
     @Parameter(required = true, readonly = true,
             defaultValue = "${project}")
     private MavenProject mavenProject;
@@ -95,6 +104,11 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (requireNonNullElseGet(skipForPackaging, Set::of).contains(mavenProject.getPackaging())) {
+            LOG.info("Skipping " + mavenProject.getPackaging() + " module");
+            return;
+        }
+
         Path outputDirectory = resolveOutputDirectory();
         try {
             Files.createDirectories(outputDirectory);
