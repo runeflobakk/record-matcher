@@ -20,12 +20,10 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Stream.concat;
@@ -52,6 +50,15 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${project.groupId}")
     private Set<String> scanPackages;
+
+
+    /**
+     * Set if scanning for records is enabled or not
+     */
+    @Parameter(required = true,
+            defaultValue = "true",
+            property = PLUGIN_CONF_PROP_PREFIX + "scanEnabled")
+    private boolean scanEnabled;
 
 
     /**
@@ -126,32 +133,48 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
 
     private Stream<Class<? extends Record>> resolveIncludedRecords() {
         ClassLoader classLoader = buildProjectClassLoader(mavenProject, this.getClass().getClassLoader());
-        return concat(
-                    scanForRecords(classLoader, scanPackages)
-                        .filter(foundRecord -> {
-                            var typeParams = foundRecord.getTypeParameters();
-                            if (typeParams.length != 0) {
-                                LOG.debug("Not including {}<{}> because type parameters are not supported",
-                                        foundRecord.getName(), Stream.of(typeParams).map(t -> t.getName()).collect(joining(", ")));
-                                return false;
-                            }
-                            return true;
-                        }),
-                    requireNonNullElseGet(includes, Collections::<String>emptySet).stream()
-                        .filter(not(String::isBlank))
-                        .map(String::trim)
-                        .<Class<? extends Record>>map(recordClassName -> load(recordClassName, Record.class, classLoader))
-                        .filter(configuredInclusion -> {
-                            var typeParams = configuredInclusion.getTypeParameters();
-                            if (typeParams.length != 0) {
-                                throw new UnsupportedOperationException(
-                                        "Can not include " + configuredInclusion.getName() +
-                                        "<" + Stream.of(typeParams).map(t -> t.getName()).collect(joining(", ")) + "> " +
-                                        "because type parameters are not supported");
-                            }
-                            return true;
-                        })
-                .distinct());
+
+        Stream<Class<? extends Record>> scannedRecords;
+        if (scanEnabled) {
+            scannedRecords = scanForRecords(classLoader, scanPackages)
+                    .filter(foundRecord -> {
+                        var typeParams = foundRecord.getTypeParameters();
+                        if (typeParams.length != 0) {
+                            LOG.debug("Not including {}<{}> because type parameters are not supported",
+                                    foundRecord.getName(), Stream.of(typeParams).map(t -> t.getName()).collect(joining(", ")));
+                            return false;
+                        }
+                        return true;
+                    });
+        } else {
+            LOG.info("Not scanning for records");
+            scannedRecords = Stream.empty();
+        }
+
+        Stream<Class<? extends Record>> configuredRecords;
+        if (includes != null && !includes.isEmpty()) {
+            configuredRecords = includes.stream()
+                    .filter(not(String::isBlank))
+                    .map(String::trim)
+                    .<Class<? extends Record>>map(recordClassName -> load(recordClassName, Record.class, classLoader))
+                    .filter(configuredInclusion -> {
+                        var typeParams = configuredInclusion.getTypeParameters();
+                        if (typeParams.length != 0) {
+                            throw new UnsupportedOperationException(
+                                    "Can not include " + configuredInclusion.getName() +
+                                    "<" + Stream.of(typeParams).map(t -> t.getName()).collect(joining(", ")) + "> " +
+                                    "because type parameters are not supported");
+                        }
+                        return true;
+                    });
+        } else {
+            if (!scanEnabled) {
+                LOG.info("No specific record types configured for inclusion");
+            }
+            configuredRecords = Stream.empty();
+        }
+
+        return concat(scannedRecords, configuredRecords).distinct();
     }
 
     private static Stream<Class<? extends Record>> scanForRecords(ClassLoader classLoader, Collection<String> packageNames) {
