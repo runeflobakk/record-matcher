@@ -112,14 +112,16 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
                             "because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
                 }
             })
+            .sorted()
             .toList();
 
 
         if (writtenFiles.isEmpty()) {
-            LOG.warn("No matchers was generated!");
+            LOG.warn("No matchers were generated!");
         } else {
+            LOG.info("Generated matchers:");
             for (var writtenFile : writtenFiles) {
-                LOG.info("Generated {}", outputDirectory.relativize(writtenFile));
+                LOG.info("  {}", outputDirectory.relativize(writtenFile));
             }
             LOG.info("Total files written: {}", writtenFiles.size());
         }
