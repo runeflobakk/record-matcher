@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static java.lang.reflect.Modifier.isPrivate;
 import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Stream.concat;
+import static no.rune.record.matcher.ScanHelper.isAccessibleFromSamePackage;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
 
@@ -162,26 +162,13 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
         LOG.info("Scanning packages {} for records", packageNames);
         var components = ComponentSupplier.getInstance();
         var allRecordsInClassLoader = SearchConfig.forResources(packageNames.stream().map(p -> p.replace('.', '/')).toList())
-                .by(ClassCriteria.create().allThoseThatMatch(cls -> cls.isRecord() && accessibleFromSamePackage(cls)))
+                .by(ClassCriteria.create().allThoseThatMatch(cls -> cls.isRecord() && isAccessibleFromSamePackage(cls)))
                 .useAsParentClassLoader(classLoader);
 
         try (var searchResult = components.getClassHunter().findBy(allRecordsInClassLoader)) {
             return searchResult.getClasses().stream().map(c -> c.asSubclass(Record.class));
         }
     }
-
-    private static boolean accessibleFromSamePackage(Class<?> cls) {
-        if (cls.isLocalClass()) {
-            return false;
-        }
-        for (var c = cls; c.getDeclaringClass() != null; c = c.getDeclaringClass()) {
-            if (isPrivate(c.getModifiers())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
     private static <C> Class<? extends C> load(String className, Class<C> target, ClassLoader classLoader) {
         try {

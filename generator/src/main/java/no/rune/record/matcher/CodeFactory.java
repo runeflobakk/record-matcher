@@ -18,7 +18,6 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.core.IsAnything;
 
 import static com.squareup.javapoet.WildcardTypeName.supertypeOf;
-import static java.lang.reflect.Modifier.isPrivate;
 import static java.util.Collections.emptyMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -27,6 +26,7 @@ import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
+import static no.rune.record.matcher.ScanHelper.isAccessibleFromSamePackage;
 
 final class CodeFactory {
 
@@ -79,7 +79,7 @@ final class CodeFactory {
 
     CodeFactory(Class<? extends Record> record, ClassName matcherClass) {
         this.defaultComponentMatchers = Stream.of(record.getRecordComponents())
-                .filter(c -> !isPrivate(c.getType().getModifiers()))
+                .filter(component -> isAccessibleFromSamePackage(component.getGenericType()))
                 .collect(collectingAndThen(toMap(
                     identity(), CodeFactory::isAnythingMatcher,
                     (v1, v2) -> { throw new IllegalStateException("Got same index for " + v1 + " and " + v2); }, LinkedHashMap::new), Collections::unmodifiableMap));
