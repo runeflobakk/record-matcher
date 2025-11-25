@@ -223,6 +223,24 @@ mvn record-matcher:help
 ```
 
 
+## But I use AssertJ!
+
+AssertJ has direct support for using Hamcrest Matchers as [Condition](https://www.javadoc.io/doc/org.assertj/assertj-core/latest/org.assertj.core/org/assertj/core/api/Condition.html)s via [HamcrestCondition](https://www.javadoc.io/doc/org.assertj/assertj-core/latest/org.assertj.core/org/assertj/core/api/HamcrestCondition.html), preferably by static importing the `matching(org.hamcrest.Matcher<? extends T> matcher)` method.
+
+The initial example with matching books can be rewritten to use AssertJ like this:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.HamcrestCondition.matching;
+import static org.hamcrest.Matchers.*;
+import static your.domain.BookMatcher.aBook();
+...
+Book effectiveJava = // resolve the Effective Java book
+assertThat(effectiveJava).is(matching(aBook().withTitle("Effective Java").withAuthors(not(empty()))));
+```
+
+
+
 
 ## License
 
