@@ -3,9 +3,10 @@
 
 # Record Matcher Generator
 
-A library and plugin for Maven to generate source code for [Hamcrest Matchers](https://hamcrest.org/JavaHamcrest/) for [Java records](https://openjdk.org/jeps/395). The API of the generated matchers reflect the names of both the record itself as well as its components (i.e. fields), and provide facilities to incrementally constrain how specific you want to express what your expectations are.
+This library and plugin for Maven generates source code for [Hamcrest Matchers](https://hamcrest.org/JavaHamcrest/) for [Java records](https://openjdk.org/jeps/395). The API of the generated matchers reflect the names of both the record itself as well as its components (i.e. fields), and provide facilities to incrementally constrain how specific you want to express what your expectations are.
 
 This project is currently in its infancy, but should still be usable. You are most welcome to play around with it, and I appreciate any feedback you may have!
+
 
 ## Example
 
@@ -20,8 +21,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static your.domain.BookMatcher.aBook();
 ...
-
-assertThat(book, is(aBook().withTitle("Effective Java").withAuthors(not(empty()))));
+Book effectiveJava = // resolve the Effective Java book
+assertThat(effectiveJava, is(aBook().withTitle("Effective Java").withAuthors(not(empty()))));
 
 List<Book> effectiveSeries = // resolve Effective Xyz series of books
 assertThat(effectiveSeries, everyItem(aBook().withTitle(containsString("Effective"))));
@@ -31,8 +32,7 @@ assertThat(effectiveSeries, everyItem(aBook().withTitle(containsString("Effectiv
 
 ## Getting started
 
-Likely, you want to use this via the Maven plugin, and this is how you would set that up in your `pom.xml`:
-
+Likely, you want to use this via the [Maven plugin](https://central.sonatype.com/artifact/com.github.runeflobakk/record-matcher-maven-plugin), and this is how the minimal configuration of the plugin looks like in your `pom.xml` file:
 
 ```xml
 <build>
@@ -40,17 +40,7 @@ Likely, you want to use this via the Maven plugin, and this is how you would set
 		<plugin>
 			<groupId>com.github.runeflobakk</groupId>
 			<artifactId>record-matcher-maven-plugin</artifactId>
-			<version>0.2.0</version> <!-- replace with any newer version -->
-			<configuration>
-				<includes>
-					<!--
-					For now, the records for which you want matchers generated needs to be enumerated.
-					An automated discovery facility is planned for later.
-					-->
-					<include>your.domain.SomeRecord</include>
-					<include>your.domain.sub.SomeOtherRecord</include>
-				</includes>
-			</configuration>
+			<version>0.3.0</version> <!-- replace with any newer version -->
 			<executions>
 				<execution>
 					<goals>
@@ -61,11 +51,58 @@ Likely, you want to use this via the Maven plugin, and this is how you would set
 		</plugin>
 		...
 ```
-Or separate the execution binding and configuration by putting the configuration into `pluginManagement`, if you prefer.
 
-The configuration above will generate the source code for `SomeRecordMatcher` and `SomeOtherRecordMatcher` and put them in `target/generated-test-sources/record-matchers` in the corresponding packages as each record they match on.
+No specific configuration of the plugin itself is strictly required, and the example above will **discover all records present in the package (including sub-packages) named the same as the [groupId](https://maven.apache.org/guides/getting-started/#:~:text=groupId%20is%20one%20of%20the%20key%20identifiers)** of your project, generate corresponding Matcher classes for them, and put them in `target/generated-test-sources/record-matchers` in the corresponding packages as each record they match on.
 
-The plugin will itself include the folder where it generates code as a test source root for the compiler. If your IDE is able to resolve source folders automatically based on any `build-helper-maven-plugin` configuration, you may also want to include this:
+Using the `groupId` of your project as the base package for the plugin to discover records may or may not suit the project you are working with, so you can change this in a `<configuration>` section for the plugin:
+
+```xml
+<plugin>
+	<groupId>com.github.runeflobakk</groupId>
+	<artifactId>record-matcher-maven-plugin</artifactId>
+	<version>0.3.0</version> <!-- replace with any newer version -->
+	<configuration>
+		<scanPackages>
+		  com.base.service
+		<scanPackages>
+	</configuration>
+	<executions>
+		...
+```
+
+The configuration above will discover any records in `com.base.service` and sub-packages and put them in `target/generated-test-sources/record-matchers` in the corresponding packages as each record they match on.
+
+You may separate the execution binding and configuration using `pluginManagement` as you see fit.
+
+Try generating some Matchers using the command `mvn generate-test-sources`, or even `mvn record-matcher:generate` to only run the plugin on an already built project.
+
+
+You can also **list several packages** separated by comma, if you want:
+```xml
+<scanPackages>
+	com.base.pkg.first,
+	com.base.pkg.another
+<scanPackages>
+```
+
+You can also **disable the scanning**, and instead **list the specific records** you want to generate Matchers for:
+
+
+
+```xml
+<configuration>
+	<scanEnabled>false</scanEnabled>
+	<includes>
+		<include>your.domain.SomeRecord</include>
+		<include>your.domain.sub.SomeOtherRecord</include>
+	</includes>
+</configuration>
+```
+
+
+The configuration above will disable scanning, but you are free to leave scanning enabled, as both approaches can be used in tandem. This will generate the source code for specifically `SomeRecordMatcher` and `SomeOtherRecordMatcher` (substitute with your own record(s)), and their static factory methods `SomeRecordMatcher.aSomeRecord()` and `SomeOtherRecordMatcher.aSomeOtherRecord()` which should provide their APIs via method chaining; you get autocompletion by typing `.` after the static factory method.
+
+The plugin will itself include the folder where it generates code as a test source root for the compiler used when building with Maven. If your IDE is able to resolve source folders automatically based on any `build-helper-maven-plugin` configuration, you may also want to include this:
 
 ```xml
 <plugin>
@@ -90,7 +127,9 @@ The plugin will itself include the folder where it generates code as a test sour
 
 Eclipse detects this, and to my knowledge IntelliJ should also support this. Alternatively, you will need to manually add `target/generated-test-sources/record-matchers` as a test source folder for your project in your IDE.
 
-After running a build, or `mvn generate-test-sources`, you should be able to see the generated Matcher classes in your IDE. The example given above would make a `SomeRecordMatcher` and `SomeOtherRecordMatcher` available (substitute with your own record(s)), and their static factory methods `SomeRecordMatcher.aSomeRecord()` and `SomeOtherRecordMatcher.aSomeOtherRecord()` which should provide their APIs via method chaining; you get autocompletion by typing `.` after the static factory method.
+After running a build, or `mvn generate-test-sources`, you should be able to see the generated Matcher classes in your IDE (a refresh of the project may be required for the IDE to see the new generated files). The example given above would make a `SomeRecordMatcher` and `SomeOtherRecordMatcher` available.
+
+See the [Complete configuration reference](#complete-configuration-reference) for more ways to configure the plugin.
 
 
 
@@ -103,7 +142,7 @@ This is the most obvious one, and what the project is really made for. Asserting
 Suppose you have this `record` returned somewhere in your code:
 
 ```java
-public record Person(UUID id, boolean isActive,
+public record Person (UUID id, boolean isActive,
 	String givenName, Optional<String> middleName, String surname,
 	String primaryEmailAddress, List<String> allEmailAddresses) {}
 ```
@@ -133,6 +172,72 @@ While you should keep your mocking code as simple as possible, there are cases w
 See [MockitoHamcrest](https://www.javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/hamcrest/MockitoHamcrest.html).
 
 
+
+## Complete configuration reference
+
+```xml
+<configuration>
+	<!-- default: true
+		can be set to false -->
+	<scanEnabled>true</scanEnabled>
+
+	<!-- default: ${project.groupId} -->
+	<scanPackages>
+		com.my.pkg,
+		com.my.other.pkg
+	</scanPackages>
+
+	<includes>
+		com.external.SomeRecord,
+		com.external.subpkg.SomeOtherRecord
+	</includes>
+
+	<excludes>
+		com.my.pkg.aux.RecordToExclude,
+		com.my.pkg.other.AnotherRecordToExclude,
+	</excludes>
+
+	<!-- default: pom
+		Maven module packaging types where you want
+		to skip executing the plugin -->
+	<skipForPackaging>pom,ear</skipForPackaging>
+
+	<!-- default: ${project.build.directory}/generated-test-sources/record-matchers -->
+	<outputDirectory>${project.build.directory}/custom</outputDirectory>
+
+	<!-- default: true
+		If you for some reason need to prevent the generated code
+		to be included as test sources in your project, set this to false -->
+	<includeGeneratedCodeAsTestSources>true</includeGeneratedCodeAsTestSources>
+
+</configuration>
+```
+
+The following command can also be used anywhere to view the plugin's own description of its configuration parameters:
+```bash
+mvn com.github.runeflobakk:record-matcher-maven-plugin::help -Dgoal=generate -Ddetail
+```
+Or the short form if you have already configured the plugin in your Maven project:
+```bash
+mvn record-matcher:help
+```
+
+
+## But I use AssertJ!
+
+AssertJ has direct support for using Hamcrest Matchers as [Condition](https://www.javadoc.io/doc/org.assertj/assertj-core/latest/org.assertj.core/org/assertj/core/api/Condition.html)s via [HamcrestCondition](https://www.javadoc.io/doc/org.assertj/assertj-core/latest/org.assertj.core/org/assertj/core/api/HamcrestCondition.html), preferably by static importing the `matching(org.hamcrest.Matcher<? extends T> matcher)` method.
+
+The initial example with matching books can be rewritten to use AssertJ like this:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.HamcrestCondition.matching;
+import static org.hamcrest.Matchers.*;
+import static your.domain.BookMatcher.aBook();
+...
+Book effectiveJava = // resolve the Effective Java book
+assertThat(effectiveJava).is(matching(aBook().withTitle("Effective Java").withAuthors(not(empty()))));
+```
 
 
 
