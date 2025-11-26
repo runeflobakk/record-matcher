@@ -43,7 +43,7 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
      * Specifies the fully qualified class names of the records to
      * generate Hamcrest matchers for.
      */
-    @Parameter
+    @Parameter(property = PLUGIN_CONF_PROP_PREFIX + "includes")
     private Set<String> includes;
 
 
@@ -69,7 +69,7 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
      * Specifies fully qualified class names of records to
      * exclude from the Matcher generator.
      */
-    @Parameter
+    @Parameter(property = PLUGIN_CONF_PROP_PREFIX + "excludes")
     private Set<String> excludes;
 
 
@@ -95,7 +95,8 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
      * Project packaging types where execution is skipped.
      */
     @Parameter(required = true,
-            defaultValue = "pom")
+            defaultValue = "pom",
+            property = PLUGIN_CONF_PROP_PREFIX + "skipForPackaging")
     private Set<String> skipForPackaging;
 
 
