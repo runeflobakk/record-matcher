@@ -64,7 +64,7 @@ Likely, you want to use this via the [Maven plugin](https://central.sonatype.com
 		<plugin>
 			<groupId>com.github.runeflobakk</groupId>
 			<artifactId>record-matcher-maven-plugin</artifactId>
-			<version>0.3.1</version> <!-- replace with any newer version -->
+			<version>0.3.2</version> <!-- replace with any newer version -->
 			<executions>
 				<execution>
 					<goals>
@@ -84,7 +84,7 @@ Using the `groupId` of your project as the base package for the plugin to discov
 <plugin>
 	<groupId>com.github.runeflobakk</groupId>
 	<artifactId>record-matcher-maven-plugin</artifactId>
-	<version>0.3.1</version> <!-- replace with any newer version -->
+	<version>0.3.2</version> <!-- replace with any newer version -->
 	<configuration>
 		<scanPackages>
 		  com.base.service
@@ -126,7 +126,17 @@ You can also **disable the scanning**, and instead **list the specific records**
 
 The configuration above will disable scanning, but you are free to leave scanning enabled, as both approaches can be used in tandem. This will generate the source code for specifically `SomeRecordMatcher` and `SomeOtherRecordMatcher` (substitute with your own record(s)), and their static factory methods `SomeRecordMatcher.aSomeRecord()` and `SomeOtherRecordMatcher.aSomeOtherRecord()` which should provide their APIs via method chaining; you get autocompletion by typing `.` after the static factory method.
 
-The plugin will itself include the folder where it generates code as a test source root for the compiler used when building with Maven. If your IDE is able to resolve source folders automatically based on any `build-helper-maven-plugin` configuration, you may also want to include this:
+See also the [Complete configuration reference](#complete-configuration-reference) for more ways to configure the plugin.
+
+
+
+## IDE integration
+
+The plugin will itself include the folder where it generates code as a test source root for the compiler used when building with Maven.
+
+Eclipse with [M2E](https://eclipse.dev/m2e/) (default included with the Eclipse distributions for Java development) will automatically include the additional folder with the generated source code as a test source folder for projects where the plugin is configured in your `pom.xml` file. Currently, generating the Matcher sources is not performed automatically as part of the automatic incremental build in Eclipse, so this must be done with e.g. `mvn record-matcher:generate` from the command line whenever needed.
+
+To my knowledge, you need to specifically configure the inclusion of this folder in your `pom.xml` file for this folder to be recognized as a test source folder by IDEs such as IntelliJ. This can be done with [build-helper-maven-plugin](https://www.mojohaus.org/build-helper-maven-plugin/):
 
 ```xml
 <plugin>
@@ -149,11 +159,10 @@ The plugin will itself include the folder where it generates code as a test sour
 </plugin>
 ```
 
-Eclipse detects this, and to my knowledge IntelliJ should also support this. Alternatively, you will need to manually add `target/generated-test-sources/record-matchers` as a test source folder for your project in your IDE.
+Alternatively, you will need to manually add `target/generated-test-sources/record-matchers` as a test source folder for your project in your IDE.
 
-After running a build, or `mvn generate-test-sources`, you should be able to see the generated Matcher classes in your IDE (a refresh of the project may be required for the IDE to see the new generated files). The example given above would make a `SomeRecordMatcher` and `SomeOtherRecordMatcher` available.
+After running a build, e.g. `mvn generate-test-sources`, you should be able to see the generated Matcher classes in your IDE (a refresh of the project may be required for the IDE to see the changes on your file system).
 
-See the [Complete configuration reference](#complete-configuration-reference) for more ways to configure the plugin.
 
 
 
