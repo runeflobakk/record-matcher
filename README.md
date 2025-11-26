@@ -34,6 +34,25 @@ aBook().withTitle("Effective Java").withAuthors(not(empty()))
 ```
 which is used to describe what you expect the `Book` to look like, and not more specific than what is appropriate for context of this particular test. The generated `BookMatcher` will also have methods to specify `withPageCount(..)` and `withPublisher(..)`, according to the components in `Book`.
 
+## Try it out (really fast)
+
+You can try the Maven plugin without configuring anything in an existing project (even multiproject) of yours like this:
+
+```bash
+mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate
+```
+
+The plugin attempts to discover records in a particular base package (more on this below). If the package is not present in your project, you are likely to get see the following error:
+> There was an error scanning for records in package(s) [the.attempted.pkg]: IllegalArgumentException 'One or more of the input resources are incorrect'. Ensure that the packages are correctly defined and exists.
+
+You can specify a package (incl. sub-packages) to scan for records:
+```
+mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate\
+  -Drecordmatcher.scanPackages=pkg.in.your.project
+```
+
+
+
 
 ## Getting started
 
