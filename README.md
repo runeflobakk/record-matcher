@@ -64,7 +64,7 @@ Likely, you want to use this via the [Maven plugin](https://central.sonatype.com
 		<plugin>
 			<groupId>com.github.runeflobakk</groupId>
 			<artifactId>record-matcher-maven-plugin</artifactId>
-			<version>0.3.0</version> <!-- replace with any newer version -->
+			<version>0.3.1</version> <!-- replace with any newer version -->
 			<executions>
 				<execution>
 					<goals>
@@ -84,7 +84,7 @@ Using the `groupId` of your project as the base package for the plugin to discov
 <plugin>
 	<groupId>com.github.runeflobakk</groupId>
 	<artifactId>record-matcher-maven-plugin</artifactId>
-	<version>0.3.0</version> <!-- replace with any newer version -->
+	<version>0.3.1</version> <!-- replace with any newer version -->
 	<configuration>
 		<scanPackages>
 		  com.base.service
@@ -132,7 +132,7 @@ The plugin will itself include the folder where it generates code as a test sour
 <plugin>
 	<groupId>org.codehaus.mojo</groupId>
 	<artifactId>build-helper-maven-plugin</artifactId>
-	<version>3.5.0</version>
+	<version>3.6.1</version>
 	<executions>
 		<execution>
 			<id>include-record-matchers</id>
