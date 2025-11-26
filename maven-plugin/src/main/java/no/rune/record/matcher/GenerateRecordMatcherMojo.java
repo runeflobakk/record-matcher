@@ -50,7 +50,9 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
     /**
      * Specify which packages (includes any sub packages) to scan for records.
      */
-    @Parameter(defaultValue = "${project.groupId}")
+    @Parameter(
+            defaultValue = "${project.groupId}",
+            property = PLUGIN_CONF_PROP_PREFIX + "scanPackages")
     private Set<String> scanPackages;
 
 
