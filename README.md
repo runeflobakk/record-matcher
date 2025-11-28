@@ -202,7 +202,7 @@ Now, you may ask what is the point of all this fancyness, instead of just writin
 
 While you should keep your mocking code as simple as possible, there are cases where your stubs may need a bit of "smartness" to affect their behavior. Mockito allows to use Hamcrest Matchers to distinguish method invocations and how they respond, without being more specific than necessary.
 
-See [MockitoHamcrest](https://www.javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/hamcrest/MockitoHamcrest.html).
+See [MockitoHamcrest](https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/hamcrest/MockitoHamcrest.html).
 
 
 
