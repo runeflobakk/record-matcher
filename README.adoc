@@ -57,12 +57,14 @@ The plugin attempts to discover records in a particular base package (more on th
 
 > There was an error scanning for records in package(s) [the.attempted.pkg]: IllegalArgumentException 'One or more of the input resources are incorrect'. Ensure that the packages are correctly defined and exists.
 
-You can specify a package (incl. sub-packages) to scan for records:
+You can specify a package (which includes sub-packages) to scan for records:
 
 ....
 mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate\
   -Drecordmatcher.scanPackages=pkg.in.your.project
 ....
+
+Lastly, you can add `target/generated-sources/record-matchers` as a _source folder_ in your IDE to access and use the generated Hamcrest Matchers. Read on for how to configure Record Matcher Generator as an integral part of your Maven project.
 
 ---
 
