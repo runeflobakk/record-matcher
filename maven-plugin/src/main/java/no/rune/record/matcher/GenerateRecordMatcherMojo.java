@@ -119,7 +119,7 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new UncheckedIOException(
                     "Unable to create output directory " + outputDirectory + ", " +
-                            "because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
+                    "because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
         }
         if (includeGeneratedCodeAsTestSources) {
             mavenProject.addTestCompileSourceRoot(outputDirectory.toString());
@@ -226,9 +226,10 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
         }
 
         LOG.info("Scanning packages {} for records", packageNames);
-        var allRecordsInClassLoader = SearchConfig.forResources(packageNames.stream().map(p -> p.replace('.', '/')).toList())
-                .by(ClassCriteria.create().allThoseThatMatch(cls -> cls.isRecord() && isAccessibleFromSamePackage(cls)))
-                .useAsParentClassLoader(classLoader);
+        var allRecordsInClassLoader = SearchConfig
+                .byCriteria(ClassCriteria.create().allThoseThatMatch(cls -> cls.isRecord() && isAccessibleFromSamePackage(cls)))
+                .useAsParentClassLoader(classLoader)
+                .addResources(classLoader, packageNames.stream().map(p -> p.replace('.', '/')).toList());
 
         var classHunter = ComponentSupplier.getInstance().getClassHunter();
         try (var searchResult = classHunter.findBy(allRecordsInClassLoader)) {
@@ -253,11 +254,9 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
 
     private static ClassLoader buildProjectClassLoader(MavenProject project, ClassLoader parent) {
         try {
-            @SuppressWarnings("unchecked")
             List<String> classpathElements = project.getCompileClasspathElements();
             URL urls[] = new URL[classpathElements.size()];
-            for ( int i = 0; i < classpathElements.size(); ++i )
-            {
+            for ( int i = 0; i < classpathElements.size(); ++i ) {
                 urls[i] = new File(classpathElements.get( i ) ).toURI().toURL();
             }
             return new URLClassLoader(urls, parent);
