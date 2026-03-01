@@ -50,19 +50,23 @@ You can try the Maven plugin without configuring anything in an existing project
 
 [source,bash]
 ----
-mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate
+mvn test-compile \
+ com.github.runeflobakk:record-matcher-maven-plugin::prepare-output-directory \
+ com.github.runeflobakk:record-matcher-maven-plugin::generate
 ----
 
-The plugin attempts to discover records in a particular base package (more on this below). If the package is not present in your project, you are likely to get see the following error: 
+The plugin attempts to discover records in a particular base package (more on this below). If the package is not present in your project, you are likely to get see the following error:
 
 > There was an error scanning for records in package(s) [the.attempted.pkg]: IllegalArgumentException 'One or more of the input resources are incorrect'. Ensure that the packages are correctly defined and exists.
 
 You can specify a package (which includes sub-packages) to scan for records:
 
-....
-mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate\
-  -Drecordmatcher.scanPackages=pkg.in.your.project
-....
+----
+mvn test-compile \
+ com.github.runeflobakk:record-matcher-maven-plugin::prepare-output-directory \
+ com.github.runeflobakk:record-matcher-maven-plugin::generate
+ -Drecordmatcher.scanPackages=pkg.in.your.project
+----
 
 Lastly, you can add `target/generated-sources/record-matchers` as a _source folder_ in your IDE to access and use the generated Hamcrest Matchers. Read on for how to configure Record Matcher Generator as an integral part of your Maven project.
 
@@ -83,10 +87,11 @@ Likely, you want to use this via the https://central.sonatype.com/artifact/com.g
         <plugin>
             <groupId>com.github.runeflobakk</groupId>
             <artifactId>record-matcher-maven-plugin</artifactId>
-            <version>0.3.2</version> <!-- replace with any newer version -->
+            <version>0.4.0</version> <!-- replace with any newer version -->
             <executions>
                 <execution>
                     <goals>
+                        <goal>prepare-output-directory</goal>
                         <goal>generate</goal>
                     </goals>
                 </execution>
