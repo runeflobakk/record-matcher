@@ -5,7 +5,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Set;
 
 abstract class CodeGeneratorBaseMojo extends AbstractMojo {
@@ -35,7 +34,7 @@ abstract class CodeGeneratorBaseMojo extends AbstractMojo {
 
 
 
-    Path resolveOutputDirectory() {
-        return outputDirectory.toPath();
+    OutputDirectory outputDirectory() {
+        return new OutputDirectory(outputDirectory.toPath());
     }
 }

@@ -50,9 +50,7 @@ You can try the Maven plugin without configuring anything in an existing project
 
 [source,bash]
 ----
-mvn test-compile \
- com.github.runeflobakk:record-matcher-maven-plugin::prepare-output-directory \
- com.github.runeflobakk:record-matcher-maven-plugin::generate
+mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate
 ----
 
 The plugin attempts to discover records in a particular base package (more on this below). If the package is not present in your project, you are likely to get see the following error:
@@ -62,9 +60,7 @@ The plugin attempts to discover records in a particular base package (more on th
 You can specify a package (which includes sub-packages) to scan for records:
 
 ----
-mvn test-compile \
- com.github.runeflobakk:record-matcher-maven-plugin::prepare-output-directory \
- com.github.runeflobakk:record-matcher-maven-plugin::generate
+mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate\
  -Drecordmatcher.scanPackages=pkg.in.your.project
 ----
 
@@ -109,7 +105,7 @@ Using the `groupId` of your project as the base package for the plugin to discov
 <plugin>
     <groupId>com.github.runeflobakk</groupId>
     <artifactId>record-matcher-maven-plugin</artifactId>
-    <version>0.3.2</version> <!-- replace with any newer version -->
+    <version>0.4.0</version> <!-- replace with any newer version -->
     <configuration>
         <scanPackages>
           com.base.service
@@ -283,14 +279,14 @@ The following command can also be used anywhere to view the plugin’s own descr
 
 [source,bash]
 ----
-mvn com.github.runeflobakk:record-matcher-maven-plugin::help -Dgoal=generate -Ddetail
+mvn com.github.runeflobakk:record-matcher-maven-plugin::help -Ddetail
 ----
 
 Or the short form if you have already configured the plugin in your Maven project:
 
 [source,bash]
 ----
-mvn record-matcher:help
+mvn record-matcher:help -Ddetail
 ----
 
 

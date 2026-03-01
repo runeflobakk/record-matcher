@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static java.nio.file.Files.isDirectory;
 import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
@@ -84,7 +83,7 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
             return;
         }
 
-        Path outputDirectory = resolveOutputDirectory();
+        Path outputDirectory = outputDirectory().path();
         LOG.info("Generating matchers in {}", outputDirectory);
 
         var generator = new RecordMatcherGenerator();
@@ -116,33 +115,42 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
     }
 
     @Override
-    protected Path resolveOutputDirectory() {
-        Path outputDirectory = super.resolveOutputDirectory();
-        if (!isDirectory(outputDirectory)) {
-            throw new IllegalStateException(
-                    "Directory " + outputDirectory + " does not exist. " +
-                    """
-                    From record-matcher-maven-plugin version >= 0.4.0, it is required to configure the \
-                    goal 'prepare-output-directory' to create this directory separately before the \
-                    'generate' goal is run. Please ensure the plugin's execution is configured like this:
+    protected OutputDirectory outputDirectory() {
+        var outputDirectory = super.outputDirectory();
+        if (!outputDirectory.exists()) {
+            outputDirectory.create();
+            LOG.warn("""
+                Directory {} was created because it did not already exist, but you need to use \
+                the {} goal in order to include it as test sources for the project.\
+                """,
+                outputDirectory.path(), PrepareOutputDirectoryMojo.GOAL_NAME);
 
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>prepare-output-directory</goal>
-                                <goal>generate</goal>
-                            </goals>
-                        </execution>
+            LOG.info("""
+                From record-matcher-maven-plugin version >= 0.4.0, in order to include the generated \
+                matchers as compiled test code, it is required to configure the goal '{}' to create \
+                this directory separately before the '{}' goal is run. Please ensure the plugin's \
+                execution is configured like this:
+
+                <executions>
                     <execution>
+                        <goals>
+                            <goal>prepare-output-directory</goal>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                <execution>
 
-                    If you are running the goal directly from the command line, you can try prepending \
-                    the generate goal with the prepare-output-directory goal:
+                If you are running the goal directly from the command line, you can try prepending \
+                the {} goal with the {} goal:
 
-                     mvn record-matcher:prepare-output-directory record-matcher:generate
+                 mvn record-matcher:{} record-matcher:{}
 
-                    The README at https://github.com/runeflobakk/record-matcher further explains how to \
-                    run standalone goals of the record-matcher-maven-plugin.
-                    """);
+                See the README at https://github.com/runeflobakk/record-matcher for further details on \
+                configuring and/or running standalone goals of the record-matcher-maven-plugin.
+                """,
+                PrepareOutputDirectoryMojo.GOAL_NAME, GenerateRecordMatcherMojo.GOAL_NAME,
+                GenerateRecordMatcherMojo.GOAL_NAME, PrepareOutputDirectoryMojo.GOAL_NAME,
+                PrepareOutputDirectoryMojo.GOAL_NAME, GenerateRecordMatcherMojo.GOAL_NAME);
         }
         return outputDirectory;
     }

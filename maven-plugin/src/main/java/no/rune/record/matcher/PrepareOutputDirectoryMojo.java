@@ -7,11 +7,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 
 @Mojo(
@@ -35,14 +30,7 @@ public class PrepareOutputDirectoryMojo extends CodeGeneratorBaseMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        Path outputDirectory = resolveOutputDirectory();
-        try {
-            Files.createDirectories(outputDirectory);
-        } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Unable to create output directory " + outputDirectory + ", " +
-                    "because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
-        }
+        var outputDirectory = outputDirectory().create();
 
         if (includeAsTestSources) {
             mavenProject.addTestCompileSourceRoot(outputDirectory.toString());
