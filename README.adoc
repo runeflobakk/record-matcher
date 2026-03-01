@@ -269,7 +269,7 @@ assertThat(effectiveJava).is(matching(aBook().withTitle("Effective Java").withAu
     <!-- default: true
         If you for some reason need to prevent the generated code
         to be included as test sources in your project, set this to false -->
-    <includeGeneratedCodeAsTestSources>true</includeGeneratedCodeAsTestSources>
+    <includeAsTestSources>true</includeAsTestSources>
 
 </configuration>
 ----

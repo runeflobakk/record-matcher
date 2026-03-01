@@ -1,6 +1,5 @@
 package no.rune.record.matcher;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -17,13 +16,13 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.nio.file.Files.isDirectory;
 import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
@@ -33,11 +32,15 @@ import static no.rune.record.matcher.ScanHelper.isAccessibleFromSamePackage;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
 
-@Mojo(name = "generate", defaultPhase = GENERATE_TEST_SOURCES, requiresDependencyResolution = COMPILE)
-public class GenerateRecordMatcherMojo extends AbstractMojo {
+@Mojo(
+        name = GenerateRecordMatcherMojo.GOAL_NAME,
+        defaultPhase = GENERATE_TEST_SOURCES,
+        requiresDependencyResolution = COMPILE)
+public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
+
+    static final String GOAL_NAME = "generate";
 
     private static final Logger LOG = LoggerFactory.getLogger(GenerateRecordMatcherMojo.class);
-    private static final String PLUGIN_CONF_PROP_PREFIX = "recordmatcher.";
 
     /**
      * Specifies the fully qualified class names of the records to
@@ -73,37 +76,6 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
     private Set<String> excludes;
 
 
-    /**
-     * The directory where the generated Hamcrest matchers will be written to.
-     */
-    @Parameter(required = true,
-            defaultValue = "${project.build.directory}/generated-test-sources/record-matchers",
-            property = PLUGIN_CONF_PROP_PREFIX + "outputDirectory")
-    private File outputDirectory;
-
-
-    /**
-     * Whether the {@link #outputDirectory} should be included as a test sources root.
-     */
-    @Parameter(required = true,
-            defaultValue = "true",
-            property = PLUGIN_CONF_PROP_PREFIX + "includeGeneratedCodeAsTestSources")
-    private boolean includeGeneratedCodeAsTestSources;
-
-
-    /**
-     * Project packaging types where execution is skipped.
-     */
-    @Parameter(required = true,
-            defaultValue = "pom",
-            property = PLUGIN_CONF_PROP_PREFIX + "skipForPackaging")
-    private Set<String> skipForPackaging;
-
-
-    @Parameter(required = true, readonly = true,
-            defaultValue = "${project}")
-    private MavenProject mavenProject;
-
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -113,18 +85,7 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
         }
 
         Path outputDirectory = resolveOutputDirectory();
-        try {
-            Files.createDirectories(outputDirectory);
-            LOG.info("Generating Hamcrest matchers in {}", outputDirectory);
-        } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Unable to create output directory " + outputDirectory + ", " +
-                    "because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
-        }
-        if (includeGeneratedCodeAsTestSources) {
-            mavenProject.addTestCompileSourceRoot(outputDirectory.toString());
-            LOG.debug("{} has been added as a compiler test sources directory", outputDirectory);
-        }
+        LOG.info("Generating matchers in {}", outputDirectory);
 
         var generator = new RecordMatcherGenerator();
         var writtenFiles = resolveIncludedRecords()
@@ -154,8 +115,36 @@ public class GenerateRecordMatcherMojo extends AbstractMojo {
 
     }
 
-    private Path resolveOutputDirectory() {
-        return outputDirectory.toPath();
+    @Override
+    protected Path resolveOutputDirectory() {
+        Path outputDirectory = super.resolveOutputDirectory();
+        if (!isDirectory(outputDirectory)) {
+            throw new IllegalStateException(
+                    "Directory " + outputDirectory + " does not exist. " +
+                    """
+                    From record-matcher-maven-plugin version >= 0.4.0, it is required to configure the \
+                    goal 'prepare-output-directory' to create this directory separately before the \
+                    'generate' goal is run. Please ensure the plugin's execution is configured like this:
+
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-output-directory</goal>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    <execution>
+
+                    If you are running the goal directly from the command line, you can try prepending \
+                    the generate goal with the prepare-output-directory goal:
+
+                     mvn record-matcher:prepare-output-directory record-matcher:generate
+
+                    The README at https://github.com/runeflobakk/record-matcher further explains how to \
+                    run standalone goals of the record-matcher-maven-plugin.
+                    """);
+        }
+        return outputDirectory;
     }
 
 
