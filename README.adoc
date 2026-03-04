@@ -53,16 +53,16 @@ You can try the Maven plugin without configuring anything in an existing project
 mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate
 ----
 
-The plugin attempts to discover records in a particular base package (more on this below). If the package is not present in your project, you are likely to get see the following error: 
+The plugin attempts to discover records in a particular base package (more on this below). If the package is not present in your project, you are likely to get see the following error:
 
 > There was an error scanning for records in package(s) [the.attempted.pkg]: IllegalArgumentException 'One or more of the input resources are incorrect'. Ensure that the packages are correctly defined and exists.
 
 You can specify a package (which includes sub-packages) to scan for records:
 
-....
+----
 mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate\
-  -Drecordmatcher.scanPackages=pkg.in.your.project
-....
+ -Drecordmatcher.scanPackages=pkg.in.your.project
+----
 
 Lastly, you can add `target/generated-sources/record-matchers` as a _source folder_ in your IDE to access and use the generated Hamcrest Matchers. Read on for how to configure Record Matcher Generator as an integral part of your Maven project.
 
@@ -83,10 +83,11 @@ Likely, you want to use this via the https://central.sonatype.com/artifact/com.g
         <plugin>
             <groupId>com.github.runeflobakk</groupId>
             <artifactId>record-matcher-maven-plugin</artifactId>
-            <version>0.3.2</version> <!-- replace with any newer version -->
+            <version>0.4.0</version> <!-- replace with any newer version -->
             <executions>
                 <execution>
                     <goals>
+                        <goal>prepare-output-directory</goal>
                         <goal>generate</goal>
                     </goals>
                 </execution>
@@ -104,7 +105,7 @@ Using the `groupId` of your project as the base package for the plugin to discov
 <plugin>
     <groupId>com.github.runeflobakk</groupId>
     <artifactId>record-matcher-maven-plugin</artifactId>
-    <version>0.3.2</version> <!-- replace with any newer version -->
+    <version>0.4.0</version> <!-- replace with any newer version -->
     <configuration>
         <scanPackages>
           com.base.service
@@ -269,7 +270,7 @@ assertThat(effectiveJava).is(matching(aBook().withTitle("Effective Java").withAu
     <!-- default: true
         If you for some reason need to prevent the generated code
         to be included as test sources in your project, set this to false -->
-    <includeGeneratedCodeAsTestSources>true</includeGeneratedCodeAsTestSources>
+    <includeAsTestSources>true</includeAsTestSources>
 
 </configuration>
 ----
@@ -278,14 +279,14 @@ The following command can also be used anywhere to view the plugin’s own descr
 
 [source,bash]
 ----
-mvn com.github.runeflobakk:record-matcher-maven-plugin::help -Dgoal=generate -Ddetail
+mvn com.github.runeflobakk:record-matcher-maven-plugin::help -Ddetail
 ----
 
 Or the short form if you have already configured the plugin in your Maven project:
 
 [source,bash]
 ----
-mvn record-matcher:help
+mvn record-matcher:help -Ddetail
 ----
 
 
