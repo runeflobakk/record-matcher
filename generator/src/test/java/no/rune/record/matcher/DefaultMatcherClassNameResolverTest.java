@@ -6,9 +6,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.co.probablyfine.matchers.Java8Matchers.where;
 
-class DefaultRecordMatcherClassNameResolverTest {
+class DefaultMatcherClassNameResolverTest {
 
-    DefaultRecordMatcherClassNameResolver nameResolver = new DefaultRecordMatcherClassNameResolver();
+    DefaultMatcherClassNameResolver nameResolver = new DefaultMatcherClassNameResolver();
 
     @Test
     void topLevelRecordResolvesMatcherClassName() {

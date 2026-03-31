@@ -6,11 +6,12 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
+import java.util.Map;
+import no.rune.typecompanion.JavaCompilationUnit;
+import no.rune.typecompanion.TypeCompanionGenerator;
 import org.hamcrest.Description;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.IsAnything;
-
-import java.util.Map;
 
 import static com.squareup.javapoet.CodeBlock.joining;
 import static com.squareup.javapoet.TypeName.BOOLEAN;
@@ -21,12 +22,13 @@ import static no.rune.text.Affixing.withIndefArticle;
 import static no.rune.text.Casing.mapCharAt;
 import static no.rune.text.Casing.Style.camelCase;
 
-public class RecordMatcherGenerator {
+public class RecordMatcherGenerator implements TypeCompanionGenerator {
 
-    public static final RecordMatcherClassNameResolver DEFAULT_MATCHER_NAME_RESOLVER = new DefaultRecordMatcherClassNameResolver();
+    public static final RecordMatcherClassNameResolver DEFAULT_MATCHER_NAME_RESOLVER = new DefaultMatcherClassNameResolver();
 
-    public JavaCompilationUnit generateFromRecord(Class<? extends Record> record) {
-        return generateFromRecord(record, record.getPackage(), DEFAULT_MATCHER_NAME_RESOLVER.resolve(record));
+    @Override
+    public JavaCompilationUnit generateFor(Class<?> record) {
+        return generateFromRecord(record.asSubclass(Record.class), record.getPackage(), DEFAULT_MATCHER_NAME_RESOLVER.resolve(record));
     }
 
     public JavaCompilationUnit generateFromRecord(Class<? extends Record> record, Package target, String matcherSimpleClassName) {

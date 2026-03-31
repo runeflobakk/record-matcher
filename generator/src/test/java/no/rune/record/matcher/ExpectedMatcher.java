@@ -2,9 +2,9 @@ package no.rune.record.matcher;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
-
 import java.io.IOException;
 import java.nio.file.Path;
+import no.rune.typecompanion.JavaCompilationUnit;
 
 import static com.google.testing.compile.Compilation.Status.SUCCESS;
 import static com.google.testing.compile.Compiler.javac;
@@ -34,7 +34,7 @@ public record ExpectedMatcher(String fullyQualifiedClassName, String sourceCode,
     private static final RecordMatcherGenerator generator = new RecordMatcherGenerator();
 
     public JavaCompilationUnit generatedSourceCode() {
-        return generator.generateFromRecord(record());
+        return generator.generateFor(record());
     }
 
     public void assertEqualToGeneratedMatcherSourceCode() {

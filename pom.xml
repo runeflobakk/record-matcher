@@ -14,6 +14,7 @@
     <url>https://github.com/runeflobakk/record-matcher</url>
 
     <modules>
+        <module>extension-api</module>
         <module>generator</module>
         <module>maven-plugin</module>
     </modules>
@@ -49,6 +50,11 @@
                 <groupId>uk.co.probablyfine</groupId>
                 <artifactId>java-8-matchers</artifactId>
                 <version>1.9</version>
+            </dependency>
+            <dependency>
+                <groupId>org.quicktheories</groupId>
+                <artifactId>quicktheories</artifactId>
+                <version>0.26</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

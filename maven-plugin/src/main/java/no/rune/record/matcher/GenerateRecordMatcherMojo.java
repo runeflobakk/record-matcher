@@ -1,5 +1,6 @@
 package no.rune.record.matcher;
 
+import no.rune.typecompanion.ext.TypeCompanionGeneratorExtension;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -20,14 +21,14 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 import static java.util.stream.Stream.concat;
-import static no.rune.record.matcher.ScanHelper.isAccessibleFromSamePackage;
+import static no.rune.record.matcher.Collectors.multiGroupingBy;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
 
@@ -42,15 +43,15 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
     private static final Logger LOG = LoggerFactory.getLogger(GenerateRecordMatcherMojo.class);
 
     /**
-     * Specifies the fully qualified class names of the records to
-     * generate Hamcrest matchers for.
+     * Specifies the fully qualified class names of the
+     * types to generate companions for for.
      */
     @Parameter(property = PLUGIN_CONF_PROP_PREFIX + "includes")
     private Set<String> includes;
 
 
     /**
-     * Specify which packages (includes any sub packages) to scan for records.
+     * Specify which packages (includes any sub packages) to scan for source types.
      */
     @Parameter(
             defaultValue = "${project.groupId}",
@@ -59,7 +60,7 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
 
 
     /**
-     * Set if scanning for records is enabled or not.
+     * Set if scanning for source types is enabled or not.
      */
     @Parameter(required = true,
             defaultValue = "true",
@@ -68,12 +69,11 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
 
 
     /**
-     * Specifies fully qualified class names of records to
-     * exclude from the Matcher generator.
+     * Specifies fully qualified class names of types to
+     * exclude from type companion generators.
      */
     @Parameter(property = PLUGIN_CONF_PROP_PREFIX + "excludes")
     private Set<String> excludes;
-
 
 
     @Override
@@ -84,34 +84,55 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
         }
 
         Path outputDirectory = outputDirectory().path();
-        LOG.info("Generating matchers in {}", outputDirectory);
-
-        var generator = new RecordMatcherGenerator();
-        var writtenFiles = resolveIncludedRecords()
-            .map(generator::generateFromRecord)
-            .map(compilationUnit -> {
-                try {
-                    return compilationUnit.writeToBaseDirectory(outputDirectory);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(
-                            "Unable to write " + compilationUnit + " to file, " +
-                            "because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
-                }
-            })
-            .sorted()
-            .toList();
+        LOG.info("Generating type companions in {}", outputDirectory);
 
 
-        if (writtenFiles.isEmpty()) {
-            LOG.warn("No matchers were generated!");
+        var generators = generators();
+
+        var sourceTypesAssignedToGenerators = generators.stream()
+                .map(generator -> (Predicate<Class<?>>) generator::applicableFor)
+                .reduce(Predicate::or)
+                .map(this::resolveSourceTypes)
+                .orElseGet(Stream::empty)
+                .collect(multiGroupingBy(generators, TypeCompanionGeneratorExtension::applicableFor));
+
+        if (sourceTypesAssignedToGenerators.isEmpty()) {
+            LOG.info("Nothing generated, because no source types was assigned to any of the generators {}", generators);
         } else {
-            LOG.info("Generated matchers:");
-            for (var writtenFile : writtenFiles) {
-                LOG.info("  {}", outputDirectory.relativize(writtenFile));
-            }
-            LOG.info("Total files written: {}", writtenFiles.size());
+            sourceTypesAssignedToGenerators
+                .forEach((generator, sourceTypes) -> {
+                    var fileWriter = new JavaFileWriter(outputDirectory);
+                    var writtenFiles = sourceTypes.stream()
+                            .map(generator.codeGenerator()::generateFor)
+                            .map(compilationUnit -> {
+                                try {
+                                    return fileWriter.writeToFile(compilationUnit);
+                                } catch (IOException e) {
+                                    throw new UncheckedIOException(
+                                            "Unable to write " + compilationUnit + " to file, " +
+                                            "because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
+                                }
+                            })
+                            .sorted()
+                            .toList();
+
+                    if (writtenFiles.isEmpty()) {
+                        LOG.warn("Nothing generated by {}!", generator.getClass().getSimpleName());
+                    } else {
+                        LOG.info("Generated by {}:", generator.getClass().getSimpleName());
+                        for (var writtenFile : writtenFiles) {
+                            LOG.info("  {}", outputDirectory.relativize(writtenFile));
+                        }
+                        LOG.info("Total files written: {}", writtenFiles.size());
+                    }
+                });
         }
 
+
+    }
+
+    private List<TypeCompanionGeneratorExtension> generators() {
+        return List.of(new RecordMatcherGeneratorExtension());
     }
 
     @Override
@@ -127,7 +148,7 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
 
             LOG.info("""
                 From record-matcher-maven-plugin version >= 0.4.0, in order to include the generated \
-                matchers as compiled test code, it is required to configure the goal '{}' to create \
+                type companions as compiled test code, it is required to configure the goal '{}' to create \
                 this directory separately before the '{}' goal is run. Please ensure the plugin's \
                 execution is configured like this:
 
@@ -156,92 +177,73 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
     }
 
 
-    private Stream<Class<? extends Record>> resolveIncludedRecords() {
+    private Stream<Class<?>> resolveSourceTypes(Predicate<Class<?>> applicableTypes) {
         ClassLoader classLoader = buildProjectClassLoader(mavenProject, this.getClass().getClassLoader());
 
-        Stream<Class<? extends Record>> scannedRecords;
+        Stream<Class<?>> scannedTypes;
         if (scanEnabled) {
-            scannedRecords = scanForRecords(classLoader, scanPackages)
-                    .filter(foundRecord -> {
-                        var typeParams = foundRecord.getTypeParameters();
-                        if (typeParams.length != 0) {
-                            LOG.debug("Not including {}<{}> because type parameters are not supported",
-                                    foundRecord.getName(), Stream.of(typeParams).map(t -> t.getName()).collect(joining(", ")));
-                            return false;
-                        }
-                        return true;
-                    });
+            scannedTypes = scanForClasses(classLoader, scanPackages, applicableTypes);
         } else {
-            LOG.info("Not scanning for records");
-            scannedRecords = Stream.empty();
+            LOG.info("Not scanning for source types");
+            scannedTypes = Stream.empty();
         }
 
-        Stream<Class<? extends Record>> configuredRecords;
+        Stream<Class<?>> configuredTypes;
         if (includes != null && !includes.isEmpty()) {
-            configuredRecords = includes.stream()
+            configuredTypes = includes.stream()
                     .filter(not(String::isBlank))
                     .map(String::trim)
-                    .<Class<? extends Record>>map(recordClassName -> load(recordClassName, Record.class, classLoader))
-                    .filter(configuredInclusion -> {
-                        var typeParams = configuredInclusion.getTypeParameters();
-                        if (typeParams.length != 0) {
-                            throw new UnsupportedOperationException(
-                                    "Can not include " + configuredInclusion.getName() +
-                                    "<" + Stream.of(typeParams).map(t -> t.getName()).collect(joining(", ")) + "> " +
-                                    "because type parameters are not supported");
-                        }
-                        return true;
-                    });
+                    .<Class<?>>map(className -> load(className, classLoader));
         } else {
             if (!scanEnabled) {
-                LOG.info("No specific record types configured for inclusion");
+                LOG.info("No specific types configured for inclusion");
             }
-            configuredRecords = Stream.empty();
+            configuredTypes = Stream.empty();
         }
 
-        var foundRecords = concat(scannedRecords, configuredRecords).distinct();
+        var foundTypes = concat(scannedTypes, configuredTypes).distinct();
         if (excludes != null && !excludes.isEmpty()) {
-            var santizedExcludes = excludes.stream().filter(not(String::isBlank)).map(String::trim).collect(toUnmodifiableSet());
-            return foundRecords.filter(r -> {
-                if (santizedExcludes.contains(r.getName())) {
-                    LOG.info("Excluding record {}", r.getName());
+            var sanitizedExcludes = excludes.stream().filter(not(String::isBlank)).map(String::trim).collect(toUnmodifiableSet());
+            return foundTypes.filter(r -> {
+                if (sanitizedExcludes.contains(r.getName())) {
+                    LOG.info("Excluding {}", r.getName());
                     return false;
                 } else {
                     return true;
                 }
             });
         } else {
-            return foundRecords;
+            return foundTypes;
         }
     }
 
-    private static Stream<Class<? extends Record>> scanForRecords(ClassLoader classLoader, Collection<String> packageNames) {
+    private static Stream<Class<?>> scanForClasses(ClassLoader classLoader, Collection<String> packageNames, Predicate<Class<?>> applicableTypes) {
         packageNames = packageNames.stream().filter(not(String::isBlank)).map(String::trim).distinct().toList();
         if (packageNames.isEmpty()) {
             LOG.debug("No packages configured for scanning");
             return Stream.empty();
         }
 
-        LOG.info("Scanning packages {} for records", packageNames);
-        var allRecordsInClassLoader = SearchConfig
-                .byCriteria(ClassCriteria.create().allThoseThatMatch(cls -> cls.isRecord() && isAccessibleFromSamePackage(cls)))
+        LOG.info("Scanning packages {} for source types", packageNames);
+        var allApplicableTypesInClassLoader = SearchConfig
+                .byCriteria(ClassCriteria.create().allThoseThatMatch(applicableTypes))
                 .useAsParentClassLoader(classLoader)
                 .addResources(classLoader, packageNames.stream().map(p -> p.replace('.', '/')).toList());
 
         var classHunter = ComponentSupplier.getInstance().getClassHunter();
-        try (var searchResult = classHunter.findBy(allRecordsInClassLoader)) {
-            return searchResult.getClasses().stream().map(c -> c.asSubclass(Record.class));
+        try (var searchResult = classHunter.findBy(allApplicableTypesInClassLoader)) {
+            return searchResult.getClasses().stream();
         } catch (RuntimeException e) {
             throw new IllegalStateException(
-                    "There was an error scanning for records in package(s) " + packageNames + ": " +
+                    "There was an error scanning for source types in package(s) " + packageNames + ": " +
                     e.getClass().getSimpleName() + " '" + e.getMessage() + "'. Ensure that the packages " +
                     "are correctly defined and exists.", e);
         }
     }
 
-    private static <C> Class<? extends C> load(String className, Class<C> target, ClassLoader classLoader) {
+    private static <C> Class<?> load(String className, ClassLoader classLoader) {
         try {
-            return classLoader.loadClass(className).asSubclass(target);
+            return classLoader.loadClass(className);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(
                     "Unable to resolve Class from " + className +
@@ -259,7 +261,7 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
             return new URLClassLoader(urls, parent);
         } catch (Exception e) {
             throw new RuntimeException(
-                    "Unable to build classloader for resolving record classes, " +
+                    "Unable to build classloader for resolving source types, " +
                     ", because " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
         }
     }
