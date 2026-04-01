@@ -5,17 +5,20 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.runeflobakk</groupId>
-    <artifactId>record-matcher-parent</artifactId>
+    <artifactId>type-companions</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Record Matcher Parent POM</name>
-    <description>Parent POM for Record Matcher</description>
-    <url>https://github.com/runeflobakk/record-matcher</url>
+    <name>Type Companions</name>
+    <description>
+        Tooling, in particular a Maven plugin, for generating code based on any of your
+        existing types, i.e. companions for your existing classes, interfaces, enums, records.
+    </description>
+    <url>https://github.com/runeflobakk/type-companions</url>
 
     <modules>
-        <module>extension-api</module>
-        <module>generator</module>
+        <module>generator-spi</module>
+        <module>record-matcher-generator</module>
         <module>maven-plugin</module>
     </modules>
 
@@ -38,6 +41,13 @@
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>6.0.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-bom</artifactId>
+                <version>2.0.17</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -202,9 +212,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:runeflobakk/record-matcher.git</connection>
-        <developerConnection>scm:git:git@github.com:runeflobakk/record-matcher.git</developerConnection>
-        <url>https://github.com/runeflobakk/record-matcher</url>
+        <connection>scm:git:git@github.com:runeflobakk/type-companions.git</connection>
+        <developerConnection>scm:git:git@github.com:runeflobakk/type-companions.git</developerConnection>
+        <url>https://github.com/runeflobakk/type-companions</url>
     </scm>
 
 </project>

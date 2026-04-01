@@ -1,5 +1,6 @@
-package no.rune.record.matcher;
+package no.rune.typecompanion;
 
+import no.rune.record.matcher.RecordMatcherGeneratorExtension;
 import no.rune.typecompanion.ext.TypeCompanionGeneratorExtension;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -28,19 +29,19 @@ import static java.util.Objects.requireNonNullElseGet;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 import static java.util.stream.Stream.concat;
-import static no.rune.record.matcher.Collectors.multiGroupingBy;
+import static no.rune.typecompanion.Collectors.multiGroupingBy;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_TEST_SOURCES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
 
 @Mojo(
-        name = GenerateRecordMatcherMojo.GOAL_NAME,
+        name = GenerateTypeCompanionsMojo.GOAL_NAME,
         defaultPhase = GENERATE_TEST_SOURCES,
         requiresDependencyResolution = COMPILE)
-public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
+public class GenerateTypeCompanionsMojo extends CodeGeneratorBaseMojo {
 
     static final String GOAL_NAME = "generate";
 
-    private static final Logger LOG = LoggerFactory.getLogger(GenerateRecordMatcherMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenerateTypeCompanionsMojo.class);
 
     /**
      * Specifies the fully qualified class names of the
@@ -83,11 +84,11 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
             return;
         }
 
-        Path outputDirectory = outputDirectory().path();
-        LOG.info("Generating type companions in {}", outputDirectory);
-
-
         var generators = generators();
+        if (generators.isEmpty()) {
+            LOG.info("Nothing generated, because no generators could be located");
+            return;
+        }
 
         var sourceTypesAssignedToGenerators = generators.stream()
                 .map(generator -> (Predicate<Class<?>>) generator::applicableFor)
@@ -99,6 +100,8 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
         if (sourceTypesAssignedToGenerators.isEmpty()) {
             LOG.info("Nothing generated, because no source types was assigned to any of the generators {}", generators);
         } else {
+            Path outputDirectory = outputDirectory().path();
+            LOG.info("Generating type companions in {}", outputDirectory);
             sourceTypesAssignedToGenerators
                 .forEach((generator, sourceTypes) -> {
                     var fileWriter = new JavaFileWriter(outputDirectory);
@@ -169,9 +172,9 @@ public class GenerateRecordMatcherMojo extends CodeGeneratorBaseMojo {
                 See the README at https://github.com/runeflobakk/record-matcher for further details on \
                 configuring and/or running standalone goals of the record-matcher-maven-plugin.
                 """,
-                PrepareOutputDirectoryMojo.GOAL_NAME, GenerateRecordMatcherMojo.GOAL_NAME,
-                GenerateRecordMatcherMojo.GOAL_NAME, PrepareOutputDirectoryMojo.GOAL_NAME,
-                PrepareOutputDirectoryMojo.GOAL_NAME, GenerateRecordMatcherMojo.GOAL_NAME);
+                PrepareOutputDirectoryMojo.GOAL_NAME, GenerateTypeCompanionsMojo.GOAL_NAME,
+                GenerateTypeCompanionsMojo.GOAL_NAME, PrepareOutputDirectoryMojo.GOAL_NAME,
+                PrepareOutputDirectoryMojo.GOAL_NAME, GenerateTypeCompanionsMojo.GOAL_NAME);
         }
         return outputDirectory;
     }

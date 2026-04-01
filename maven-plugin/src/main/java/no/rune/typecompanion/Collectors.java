@@ -1,4 +1,4 @@
-package no.rune.record.matcher;
+package no.rune.typecompanion;
 
 import java.util.ArrayList;
 import java.util.Collection;

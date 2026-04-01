@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>com.github.runeflobakk</groupId>
-        <artifactId>record-matcher-parent</artifactId>
+        <artifactId>type-companions</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -13,11 +13,11 @@
     </prerequisites>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>record-matcher-maven-plugin</artifactId>
+    <artifactId>type-companions-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
-    <name>Record Matcher Generator Maven Plugin</name>
-    <description>Maven plugin for generating Hamcrest matchers for Java records</description>
+    <name>Type Companions Maven Plugin</name>
+    <description>Maven plugin for generating companions for your types</description>
 
     <properties>
         <maven.plugin-tools.version>3.15.2</maven.plugin-tools.version>
@@ -45,18 +45,17 @@
         </dependency>
         <dependency>
             <groupId>com.github.runeflobakk</groupId>
-            <artifactId>type-companion-generator-extension-api</artifactId>
+            <artifactId>type-companions-generator-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.runeflobakk</groupId>
-            <artifactId>record-matcher-codegenerator</artifactId>
+            <artifactId>record-matcher-generator</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.17</version>
         </dependency>
         <dependency>
             <groupId>org.burningwave</groupId>

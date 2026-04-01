@@ -1,4 +1,4 @@
-package no.rune.record.matcher;
+package no.rune.typecompanion;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

@@ -6,13 +6,13 @@
 
     <parent>
         <groupId>com.github.runeflobakk</groupId>
-        <artifactId>record-matcher-parent</artifactId>
+        <artifactId>type-companions</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>type-companion-generator-extension-api</artifactId>
+    <artifactId>type-companions-generator-spi</artifactId>
 
-    <name>Type Companion Generator Extension API</name>
-    <description>API specification for extensions to Record Matcher Generator</description>
+    <name>Type Companions Generator SPI</name>
+    <description>SPI for implementing type companion generators</description>
 
 </project>

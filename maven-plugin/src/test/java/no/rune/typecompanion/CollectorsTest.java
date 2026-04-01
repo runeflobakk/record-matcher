@@ -1,4 +1,4 @@
-package no.rune.record.matcher;
+package no.rune.typecompanion;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Math.abs;
 import static java.util.stream.Collectors.groupingBy;
-import static no.rune.record.matcher.Collectors.multiGroupingBy;
+import static no.rune.typecompanion.Collectors.multiGroupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsInAnyOrder;

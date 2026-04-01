@@ -1,6 +1,4 @@
-package no.rune.record.matcher;
-
-import no.rune.typecompanion.JavaCompilationUnit;
+package no.rune.typecompanion;
 
 import java.io.IOException;
 import java.nio.file.Files;

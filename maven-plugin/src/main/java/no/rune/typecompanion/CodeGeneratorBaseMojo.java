@@ -1,4 +1,4 @@
-package no.rune.record.matcher;
+package no.rune.typecompanion;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;

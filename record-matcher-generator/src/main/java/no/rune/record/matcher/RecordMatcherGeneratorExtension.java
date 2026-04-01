@@ -1,15 +1,14 @@
 package no.rune.record.matcher;
 
+import java.util.stream.Stream;
 import no.rune.typecompanion.ext.TypeCompanionGeneratorExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.stream.Stream;
-
 import static java.util.stream.Collectors.joining;
 import static no.rune.record.matcher.ScanHelper.isAccessibleFromSamePackage;
 
-class RecordMatcherGeneratorExtension implements TypeCompanionGeneratorExtension {
+public class RecordMatcherGeneratorExtension implements TypeCompanionGeneratorExtension {
 
     private static final Logger LOG = LoggerFactory.getLogger(RecordMatcherGeneratorExtension.class);
 

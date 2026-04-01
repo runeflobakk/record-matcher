@@ -31,7 +31,7 @@ public class RecordMatcherGenerator implements TypeCompanionGenerator {
         return generateFromRecord(record.asSubclass(Record.class), record.getPackage(), DEFAULT_MATCHER_NAME_RESOLVER.resolve(record));
     }
 
-    public JavaCompilationUnit generateFromRecord(Class<? extends Record> record, Package target, String matcherSimpleClassName) {
+    JavaCompilationUnit generateFromRecord(Class<? extends Record> record, Package target, String matcherSimpleClassName) {
 
         var codeFactory = new CodeFactory(record, ClassName.get(target.getName(), matcherSimpleClassName));
 
