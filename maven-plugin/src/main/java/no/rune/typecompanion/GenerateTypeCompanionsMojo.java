@@ -151,9 +151,9 @@ public class GenerateTypeCompanionsMojo extends CodeGeneratorBaseMojo {
                 outputDirectory.path(), PrepareOutputDirectoryMojo.GOAL_NAME);
 
             LOG.info("""
-                From record-matcher-maven-plugin version >= 0.4.0, in order to include the generated \
-                type companions as compiled test code, it is required to configure the goal '{}' to create \
-                this directory separately before the '{}' goal is run. Please ensure the plugin's \
+                In order to include the generated code as compiled test code, \
+                it is required to configure the goal '{}' to create this directory \
+                separately before the '{}' goal is run. Please ensure the plugin's \
                 execution is configured like this:
 
                 <executions>
@@ -168,10 +168,10 @@ public class GenerateTypeCompanionsMojo extends CodeGeneratorBaseMojo {
                 If you are running the goal directly from the command line, you can try prepending \
                 the {} goal with the {} goal:
 
-                 mvn record-matcher:{} record-matcher:{}
+                 mvn type-companions:{} type-companions:{}
 
-                See the README at https://github.com/runeflobakk/record-matcher for further details on \
-                configuring and/or running standalone goals of the record-matcher-maven-plugin.
+                See the README at https://github.com/runeflobakk/type-companions for further details on \
+                configuring and/or running standalone goals of the type-companions-maven-plugin.
                 """,
                 PrepareOutputDirectoryMojo.GOAL_NAME, GenerateTypeCompanionsMojo.GOAL_NAME,
                 GenerateTypeCompanionsMojo.GOAL_NAME, PrepareOutputDirectoryMojo.GOAL_NAME,

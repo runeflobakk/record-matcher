@@ -15,7 +15,7 @@ abstract class CodeGeneratorBaseMojo extends AbstractMojo {
      * The directory where the generated code will be written to.
      */
     @Parameter(required = true,
-            defaultValue = "${project.build.directory}/generated-test-sources/record-matchers",
+            defaultValue = "${project.build.directory}/generated-test-sources/type-companions",
             property = PLUGIN_CONF_PROP_PREFIX + "outputDirectory")
     private File outputDirectory;
 
