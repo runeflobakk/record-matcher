@@ -1,14 +1,14 @@
 :doctype: book
 :toc: macro
 
-image::https://img.shields.io/maven-central/v/com.github.runeflobakk/record-matcher-maven-plugin[Maven Central Version^]
+image::https://img.shields.io/maven-central/v/com.github.runeflobakk/type-companions-maven-plugin[Maven Central Version^]
 
 [discrete]
-= Record Matcher Generator
+= Record Matchers and other generated Type Companions
 
-This library and plugin for Maven generates source code for https://hamcrest.org/JavaHamcrest/[Hamcrest Matchers^] for https://openjdk.org/jeps/395[Java records^]. The API of the generated matchers reflect the names of both the record itself as well as its components (i.e. fields), and provide facilities to incrementally constrain how specific you want to express what your expectations are.
+This is a library and plugin for Maven to generate "companion code" for types. In particular, currently it has built-in support for generating source code for https://hamcrest.org/JavaHamcrest/[Hamcrest Matchers^] for https://openjdk.org/jeps/395[Java records^]. The API of the generated matchers reflect the names of both the record itself as well as its components (i.e. fields), and provide facilities to incrementally constrain how specific you want to express what your expectations are.
 
-This project is currently in its infancy, but should still be usable. You are most welcome to play around with it, and I appreciate any feedback you may have!
+This project is beginning to mature, but formally still considered unstable. The Maven plugin should be very useful and relatively stable in terms of behavior and configuring, but any APIs/SPIs is expected to change, and should be considered as non-public internals. You are most welcome to play around with it, and I appreciate any feedback you may have!
 
 
 [discrete]
@@ -50,7 +50,7 @@ You can try the Maven plugin without configuring anything in an existing project
 
 [source,bash]
 ----
-mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate
+mvn test-compile com.github.runeflobakk:type-companions-maven-plugin::generate
 ----
 
 The plugin attempts to discover records in a particular base package (more on this below). If the package is not present in your project, you are likely to get see the following error:
@@ -60,11 +60,11 @@ The plugin attempts to discover records in a particular base package (more on th
 You can specify a package (which includes sub-packages) to scan for records:
 
 ----
-mvn test-compile com.github.runeflobakk:record-matcher-maven-plugin::generate\
- -Drecordmatcher.scanPackages=pkg.in.your.project
+mvn test-compile com.github.runeflobakk:type-companions-maven-plugin::generate\
+ -Dtc.scanPackages=pkg.in.your.project
 ----
 
-Lastly, you can add `target/generated-sources/record-matchers` as a _source folder_ in your IDE to access and use the generated Hamcrest Matchers. Read on for how to configure Record Matcher Generator as an integral part of your Maven project.
+Lastly, you can add `target/generated-sources/type-companions` as a _source folder_ in your IDE to access and use the generated Hamcrest Matchers. Read on for how to configure Record Matcher Generator as an integral part of your Maven project.
 
 ---
 
@@ -74,7 +74,7 @@ toc::[]
 
 == Getting started
 
-Likely, you want to use this via the https://central.sonatype.com/artifact/com.github.runeflobakk/record-matcher-maven-plugin[Maven plugin^], and this is how the minimal configuration of the plugin looks like in your `pom.xml` file:
+Likely, you want to use this via the https://central.sonatype.com/artifact/com.github.runeflobakk/type-companions-maven-plugin[Maven plugin^], and this is how the minimal configuration of the plugin looks like in your `pom.xml` file:
 
 [source,xml]
 ----
@@ -82,7 +82,7 @@ Likely, you want to use this via the https://central.sonatype.com/artifact/com.g
     <plugins>
         <plugin>
             <groupId>com.github.runeflobakk</groupId>
-            <artifactId>record-matcher-maven-plugin</artifactId>
+            <artifactId>type-companions-maven-plugin</artifactId>
             <version>0.4.0</version> <!-- replace with any newer version -->
             <executions>
                 <execution>
@@ -96,7 +96,7 @@ Likely, you want to use this via the https://central.sonatype.com/artifact/com.g
         ...
 ----
 
-No specific configuration of the plugin itself is strictly required, and the example above will *discover all records present in the package (including sub-packages) named the same as the https://maven.apache.org/guides/getting-started/#:~:text=groupId%20is%20one%20of%20the%20key%20identifiers[groupId]* of your project, generate corresponding Matcher classes for them, and put them in `target/generated-test-sources/record-matchers` in the corresponding packages as each record they match on.
+No specific configuration of the plugin itself is strictly required, and the example above will *discover all records present in the package (including sub-packages) named the same as the https://maven.apache.org/guides/getting-started/#:~:text=groupId%20is%20one%20of%20the%20key%20identifiers[groupId]* of your project, generate corresponding Matcher classes for them, and put them in `target/generated-test-sources/type-companions` in the corresponding packages as each record they match on.
 
 Using the `groupId` of your project as the base package for the plugin to discover records may or may not suit the project you are working with, so you can change this in a `++<++configuration++>++` section for the plugin:
 
@@ -104,7 +104,7 @@ Using the `groupId` of your project as the base package for the plugin to discov
 ----
 <plugin>
     <groupId>com.github.runeflobakk</groupId>
-    <artifactId>record-matcher-maven-plugin</artifactId>
+    <artifactId>type-companions-maven-plugin</artifactId>
     <version>0.4.0</version> <!-- replace with any newer version -->
     <configuration>
         <scanPackages>
@@ -115,11 +115,11 @@ Using the `groupId` of your project as the base package for the plugin to discov
         ...
 ----
 
-The configuration above will discover any records in `com.base.service` and sub-packages and put them in `target/generated-test-sources/record-matchers` in the corresponding packages as each record they match on.
+The configuration above will discover any records in `com.base.service` and sub-packages and put them in `target/generated-test-sources/type-companions` in the corresponding packages as each record they match on.
 
 You may separate the execution binding and configuration using `pluginManagement` as you see fit.
 
-Try generating some Matchers using the command `mvn generate-test-sources`, or even `mvn record-matcher:generate` to only run the plugin on an already built project.
+Try generating some Matchers using the command `mvn generate-test-sources`, or even `mvn type-companions:generate` to only run the plugin on an already built project.
 
 You can also *list several packages* separated by comma, if you want:
 
@@ -152,7 +152,7 @@ See also the link:#complete-configuration-reference[Complete configuration refer
 
 The plugin will itself include the folder where it generates code as a test source root for the compiler used when building with Maven.
 
-Eclipse with https://eclipse.dev/m2e/[M2E^] (default included with the Eclipse distributions for Java development) will automatically include the additional folder with the generated source code as a test source folder for projects where the plugin is configured in your `pom.xml` file. Currently, generating the Matcher sources is not performed automatically as part of the automatic incremental build in Eclipse, so this must be done with e.g. `mvn record-matcher:generate` from the command line whenever needed.
+Eclipse with https://eclipse.dev/m2e/[M2E^] (default included with the Eclipse distributions for Java development) will automatically include the additional folder with the generated source code as a test source folder for projects where the plugin is configured in your `pom.xml` file. Currently, generating the Matcher sources is not performed automatically as part of the automatic incremental build in Eclipse, so this must be done with e.g. `mvn type-companions:generate` from the command line whenever needed.
 
 To my knowledge, you need to specifically configure the inclusion of this folder in your `pom.xml` file for this folder to be recognized as a test source folder by IDEs such as IntelliJ. This can be done with https://www.mojohaus.org/build-helper-maven-plugin/[build-helper-maven-plugin^]:
 
@@ -164,13 +164,13 @@ To my knowledge, you need to specifically configure the inclusion of this folder
     <version>3.6.1</version>
     <executions>
         <execution>
-            <id>include-record-matchers</id>
+            <id>include-type-companions</id>
             <goals>
                 <goal>add-test-source</goal>
             </goals>
             <configuration>
                 <sources>
-                    <source>target/generated-test-sources/record-matchers</source>
+                    <source>target/generated-test-sources/type-companions</source>
                 </sources>
             </configuration>
         </execution>
@@ -178,7 +178,7 @@ To my knowledge, you need to specifically configure the inclusion of this folder
 </plugin>
 ----
 
-Alternatively, you will need to manually add `target/generated-test-sources/record-matchers` as a test source folder for your project in your IDE.
+Alternatively, you will need to manually add `target/generated-test-sources/type-companions` as a test source folder for your project in your IDE.
 
 After running a build, e.g. `mvn generate-test-sources`, you should be able to see the generated Matcher classes in your IDE (a refresh of the project may be required for the IDE to see the changes on your file system).
 
@@ -202,7 +202,7 @@ And you need to test a case which concerns whether a person is active or not (wh
 [source,java]
 ----
 import your.domain.Person;
-import static your.domain.PersonMatcher.aPerson; //generated by record-matcher-generator
+import static your.domain.PersonMatcher.aPerson; //generated by type-companions-maven-plugin
 ...
 
 Person activePerson = //resolve the person expected to be active
@@ -264,7 +264,7 @@ assertThat(effectiveJava).is(matching(aBook().withTitle("Effective Java").withAu
         to skip executing the plugin -->
     <skipForPackaging>pom,ear</skipForPackaging>
 
-    <!-- default: ${project.build.directory}/generated-test-sources/record-matchers -->
+    <!-- default: ${project.build.directory}/generated-test-sources/type-companions -->
     <outputDirectory>${project.build.directory}/custom</outputDirectory>
 
     <!-- default: true
@@ -279,14 +279,14 @@ The following command can also be used anywhere to view the plugin’s own descr
 
 [source,bash]
 ----
-mvn com.github.runeflobakk:record-matcher-maven-plugin::help -Ddetail
+mvn com.github.runeflobakk:type-companions-maven-plugin::help -Ddetail
 ----
 
 Or the short form if you have already configured the plugin in your Maven project:
 
 [source,bash]
 ----
-mvn record-matcher:help -Ddetail
+mvn type-companions:help -Ddetail
 ----
 
 
