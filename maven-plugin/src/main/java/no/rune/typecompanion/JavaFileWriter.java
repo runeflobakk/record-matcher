@@ -1,5 +1,7 @@
 package no.rune.typecompanion;
 
+import no.rune.typecompanion.generator.JavaCompilationUnit;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
