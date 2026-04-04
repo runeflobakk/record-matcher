@@ -9,7 +9,7 @@ import java.util.Set;
 
 abstract class CodeGeneratorBaseMojo extends AbstractMojo {
 
-    protected static final String PLUGIN_CONF_PROP_PREFIX = "recordmatcher.";
+    protected static final String PLUGIN_CONF_PROP_PREFIX = "tc.";
 
     /**
      * The directory where the generated code will be written to.
