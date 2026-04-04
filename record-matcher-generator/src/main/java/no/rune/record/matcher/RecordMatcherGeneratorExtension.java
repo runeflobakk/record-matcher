@@ -1,5 +1,6 @@
 package no.rune.record.matcher;
 
+import com.google.auto.service.AutoService;
 import java.util.stream.Stream;
 import no.rune.typecompanion.ext.TypeCompanionGeneratorExtension;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import static java.util.stream.Collectors.joining;
 import static no.rune.record.matcher.ScanHelper.isAccessibleFromSamePackage;
 
+@AutoService(TypeCompanionGeneratorExtension.class)
 public class RecordMatcherGeneratorExtension implements TypeCompanionGeneratorExtension {
 
     private static final Logger LOG = LoggerFactory.getLogger(RecordMatcherGeneratorExtension.class);

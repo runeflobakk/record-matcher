@@ -52,6 +52,7 @@
             <groupId>com.github.runeflobakk</groupId>
             <artifactId>record-matcher-generator</artifactId>
             <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

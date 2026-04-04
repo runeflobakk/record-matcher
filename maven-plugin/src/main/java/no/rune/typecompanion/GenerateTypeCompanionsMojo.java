@@ -1,6 +1,5 @@
 package no.rune.typecompanion;
 
-import no.rune.record.matcher.RecordMatcherGeneratorExtension;
 import no.rune.typecompanion.ext.TypeCompanionGeneratorExtension;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -21,6 +20,8 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.ServiceLoader;
+import java.util.ServiceLoader.Provider;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -135,7 +136,7 @@ public class GenerateTypeCompanionsMojo extends CodeGeneratorBaseMojo {
     }
 
     private List<TypeCompanionGeneratorExtension> generators() {
-        return List.of(new RecordMatcherGeneratorExtension());
+        return ServiceLoader.load(TypeCompanionGeneratorExtension.class).stream().map(Provider::get).toList();
     }
 
     @Override
