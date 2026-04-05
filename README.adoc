@@ -186,7 +186,7 @@ After running a build, e.g. `mvn generate-test-sources`, you should be able to 
 
 === Tests
 
-This is the most obvious one, and what the project is really made for. Asserting with Hamcrest Matchers are done with the https://hamcrest.org/JavaHamcrest/javadoc/2.2/org/hamcrest/MatcherAssert.html[assertThat(..)^] method.
+This is the most obvious one, and what the project is really made for. Asserting with Hamcrest Matchers are done with the https://hamcrest.org/JavaHamcrest/javadoc/3.0/org/hamcrest/MatcherAssert.html[assertThat(..)^] method.
 
 Suppose you have this `record` returned somewhere in your code:
 
