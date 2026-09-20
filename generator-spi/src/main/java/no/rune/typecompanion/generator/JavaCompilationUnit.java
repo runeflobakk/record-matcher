@@ -8,4 +8,8 @@ public record JavaCompilationUnit(String content, String name, Optional<String> 
         this(content, name, Optional.of(location).map(Package::getName));
     }
 
+    public String fullyQualifiedName() {
+        return packageName.map(pName -> pName + "." + name).orElse(name);
+    }
+
 }

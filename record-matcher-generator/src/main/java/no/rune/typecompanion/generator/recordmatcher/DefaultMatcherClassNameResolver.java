@@ -1,6 +1,6 @@
 package no.rune.typecompanion.generator.recordmatcher;
 
-final class DefaultMatcherClassNameResolver implements RecordMatcherClassNameResolver {
+final class DefaultMatcherClassNameResolver implements TypeCompanionClassNameResolver {
 
     @Override
     public String resolve(Class<?> type) {

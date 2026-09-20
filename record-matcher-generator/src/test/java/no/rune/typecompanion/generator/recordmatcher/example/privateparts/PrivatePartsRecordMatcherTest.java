@@ -1,12 +1,15 @@
 package no.rune.typecompanion.generator.recordmatcher.example.privateparts;
 
+import no.rune.typecompanion.generator.recordmatcher.RecordMatcherGenerator;
 import org.junit.jupiter.api.Test;
 
-import static no.rune.typecompanion.generator.recordmatcher.ExpectedMatcher.expectedMatcherFor;
+import static no.rune.typecompanion.generator.JavaCompilationUnitMatcher.compiles;
+import static no.rune.typecompanion.generator.JavaSourceFileReader.testSourcesReader;
 import static no.rune.typecompanion.generator.recordmatcher.example.privateparts.PrivatePartsRecordMatcher.aPrivatePartsRecord;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.co.probablyfine.matchers.Java8Matchers.where;
 
@@ -46,7 +49,9 @@ class PrivatePartsRecordMatcherTest {
 
     @Test
     void generatesExpectedMatcher() {
-        expectedMatcherFor(PrivatePartsRecord.class).assertEqualToGeneratedMatcherSourceCode();
+        var generatedMatcher = new RecordMatcherGenerator().generateFor(PrivatePartsRecord.class);
+        assertEquals(testSourcesReader.readSourceOf(PrivatePartsRecordMatcher.class), generatedMatcher.content());
+        assertThat(generatedMatcher, compiles());
     }
 
 }

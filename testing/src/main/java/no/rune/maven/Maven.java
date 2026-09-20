@@ -1,4 +1,4 @@
-package no.rune.util;
+package no.rune.maven;
 
 import java.net.URI;
 import java.net.URISyntaxException;

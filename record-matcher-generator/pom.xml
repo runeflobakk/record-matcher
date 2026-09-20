@@ -57,6 +57,12 @@
             <version>0.23.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.runeflobakk</groupId>
+            <artifactId>type-companions-generator-testing</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

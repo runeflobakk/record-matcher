@@ -1,13 +1,16 @@
 package no.rune.typecompanion.generator.recordmatcher.example.twovalues;
 
+import no.rune.typecompanion.generator.recordmatcher.RecordMatcherGenerator;
 import org.junit.jupiter.api.Test;
 
-import static no.rune.typecompanion.generator.recordmatcher.ExpectedMatcher.expectedMatcherFor;
+import static no.rune.typecompanion.generator.JavaCompilationUnitMatcher.compiles;
+import static no.rune.typecompanion.generator.JavaSourceFileReader.testSourcesReader;
 import static no.rune.typecompanion.generator.recordmatcher.example.twovalues.TwoValuesRecordMatcher.aTwoValuesRecord;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.co.probablyfine.matchers.Java8Matchers.where;
 
@@ -60,7 +63,9 @@ class TwoValuesRecordMatcherTest {
 
     @Test
     void generatesExpectedMatcher() {
-        expectedMatcherFor(TwoValuesRecord.class).assertEqualToGeneratedMatcherSourceCode();
+        var generatedMatcher = new RecordMatcherGenerator().generateFor(TwoValuesRecord.class);
+        assertEquals(testSourcesReader.readSourceOf(TwoValuesRecordMatcher.class), generatedMatcher.content());
+        assertThat(generatedMatcher, compiles());
     }
 
 }

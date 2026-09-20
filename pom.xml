@@ -18,6 +18,7 @@
 
     <modules>
         <module>generator-spi</module>
+        <module>testing</module>
         <module>record-matcher-generator</module>
         <module>maven-plugin</module>
     </modules>

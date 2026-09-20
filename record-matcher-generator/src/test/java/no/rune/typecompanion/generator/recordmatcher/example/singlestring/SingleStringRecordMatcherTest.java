@@ -1,12 +1,15 @@
 package no.rune.typecompanion.generator.recordmatcher.example.singlestring;
 
+import no.rune.typecompanion.generator.recordmatcher.RecordMatcherGenerator;
 import org.junit.jupiter.api.Test;
 
-import static no.rune.typecompanion.generator.recordmatcher.ExpectedMatcher.expectedMatcherFor;
+import static no.rune.typecompanion.generator.JavaCompilationUnitMatcher.compiles;
+import static no.rune.typecompanion.generator.JavaSourceFileReader.testSourcesReader;
 import static no.rune.typecompanion.generator.recordmatcher.example.singlestring.SingleStringRecordMatcher.aSingleStringRecord;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.co.probablyfine.matchers.Java8Matchers.where;
 
@@ -41,7 +44,9 @@ class SingleStringRecordMatcherTest {
 
     @Test
     void generatesExpectedMatcher() {
-        expectedMatcherFor(SingleStringRecord.class).assertEqualToGeneratedMatcherSourceCode();
+        var generatedMatcher = new RecordMatcherGenerator().generateFor(SingleStringRecord.class);
+        assertEquals(testSourcesReader.readSourceOf(SingleStringRecordMatcher.class), generatedMatcher.content());
+        assertThat(generatedMatcher, compiles());
     }
 
 }

@@ -1,11 +1,14 @@
 package no.rune.typecompanion.generator.recordmatcher.example.empty;
 
+import no.rune.typecompanion.generator.recordmatcher.RecordMatcherGenerator;
 import org.junit.jupiter.api.Test;
 
-import static no.rune.typecompanion.generator.recordmatcher.ExpectedMatcher.expectedMatcherFor;
+import static no.rune.typecompanion.generator.JavaCompilationUnitMatcher.compiles;
+import static no.rune.typecompanion.generator.JavaSourceFileReader.testSourcesReader;
 import static no.rune.typecompanion.generator.recordmatcher.example.empty.EmptyRecordMatcher.anEmptyRecord;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.co.probablyfine.matchers.Java8Matchers.where;
 
@@ -25,7 +28,9 @@ class EmptyRecordMatcherTest {
 
     @Test
     void generatesExpectedMatcher() {
-        expectedMatcherFor(EmptyRecord.class).assertEqualToGeneratedMatcherSourceCode();
+        var generatedMatcher = new RecordMatcherGenerator().generateFor(EmptyRecord.class);
+        assertEquals(testSourcesReader.readSourceOf(EmptyRecordMatcher.class), generatedMatcher.content());
+        assertThat(generatedMatcher, compiles());
     }
 
 }

@@ -1,8 +1,8 @@
 package no.rune.typecompanion.generator.recordmatcher;
 
 @FunctionalInterface
-interface RecordMatcherClassNameResolver {
+interface TypeCompanionClassNameResolver {
 
-    String resolve(Class<?> record);
+    String resolve(Class<?> type);
 
 }

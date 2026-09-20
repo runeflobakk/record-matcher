@@ -24,7 +24,7 @@ import static no.rune.text.Casing.Style.camelCase;
 
 public class RecordMatcherGenerator implements TypeCompanionGenerator {
 
-    public static final RecordMatcherClassNameResolver DEFAULT_MATCHER_NAME_RESOLVER = new DefaultMatcherClassNameResolver();
+    public static final TypeCompanionClassNameResolver DEFAULT_MATCHER_NAME_RESOLVER = new DefaultMatcherClassNameResolver();
 
     @Override
     public JavaCompilationUnit generateFor(Class<?> record) {
