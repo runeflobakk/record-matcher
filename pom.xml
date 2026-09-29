@@ -20,6 +20,7 @@
         <module>generator-spi</module>
         <module>testing</module>
         <module>record-matcher-generator</module>
+        <module>sealed-type-matcher-generator</module>
         <module>maven-plugin</module>
     </modules>
 
