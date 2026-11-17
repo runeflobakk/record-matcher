@@ -10,8 +10,10 @@ final class ScanHelper {
 
     static boolean isAccessibleFromSamePackage(Type type) {
         if (type instanceof Class<?> cls) {
-            if (cls.isLocalClass()) {
-                return false;
+            for (var c = cls; c != null; c = c.getDeclaringClass()) {
+                if (c.isLocalClass()) {
+                    return false;
+                }
             }
             if (cls.isArray()) {
                 return isAccessibleFromSamePackage(cls.getComponentType());
