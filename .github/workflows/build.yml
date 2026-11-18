@@ -27,20 +27,22 @@ jobs:
     needs: publishing_parameters
     runs-on: ubuntu-latest
     env:
-      MAVEN_ARGS: --show-version --no-transfer-progress
+      MAVEN_ARGS: --show-version --batch-mode
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
     - name: Set up JDK 17
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with:
         distribution: 'temurin'
         java-version-file: '.java-version'
         cache: maven
+        show-download-progress: true
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-        gpg-passphrase: MAVEN_GPG_PASSPHRASE
-        server-id: central
-        server-username: MAVEN_CENTRAL_PUBLISH_USERNAME
-        server-password: MAVEN_CENTRAL_PUBLISH_PASSWORD
+        gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
+        mvn-server-credentials: |
+          central:MAVEN_CENTRAL_PUBLISH_USERNAME:MAVEN_CENTRAL_PUBLISH_PASSWORD
+        mvn-server-repository-origins: |
+          central:https://central.sonatype.com
     - name: Set version ${{ needs.publishing_parameters.outputs.version }}
       run: mvn versions:set -DnewVersion=${{ needs.publishing_parameters.outputs.version }}
     - name: Build with Maven
