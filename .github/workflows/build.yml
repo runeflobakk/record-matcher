@@ -27,7 +27,7 @@ jobs:
     needs: publishing_parameters
     runs-on: ubuntu-latest
     env:
-      MAVEN_ARGS: --show-version --no-transfer-progress
+      MAVEN_ARGS: --show-version --batch-mode
     steps:
     - uses: actions/checkout@v7
     - name: Set up JDK 17
