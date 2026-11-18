@@ -38,6 +38,14 @@ class ScanHelperTest {
         void privateRecord() {
             assertThat(Private.class, whereNot(ScanHelper::isAccessibleFromSamePackage));
         }
+
+        @Test
+        void nonLocalRecordNestedInsideLocalRecord() {
+            record Outer(int x) {
+                record Inner(int y) {}
+            }
+            assertThat(Outer.Inner.class, whereNot(ScanHelper::isAccessibleFromSamePackage));
+        }
     }
 
     @Nested
