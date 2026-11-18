@@ -83,7 +83,7 @@ Likely, you want to use this via the https://central.sonatype.com/artifact/com.g
         <plugin>
             <groupId>com.github.runeflobakk</groupId>
             <artifactId>record-matcher-maven-plugin</artifactId>
-            <version>0.4.0</version> <!-- replace with any newer version -->
+            <version>0.4.1</version> <!-- replace with any newer version -->
             <executions>
                 <execution>
                     <goals>
@@ -105,7 +105,7 @@ Using the `groupId` of your project as the base package for the plugin to discov
 <plugin>
     <groupId>com.github.runeflobakk</groupId>
     <artifactId>record-matcher-maven-plugin</artifactId>
-    <version>0.4.0</version> <!-- replace with any newer version -->
+    <version>0.4.1</version> <!-- replace with any newer version -->
     <configuration>
         <scanPackages>
           com.base.service
